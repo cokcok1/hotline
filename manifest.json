@@ -1,0 +1,21 @@
+{
+  "name": "上帝緊急熱線",
+  "short_name": "上帝緊急熱線",
+  "start_url": "./hotline.html",
+  "display": "standalone",
+  "background_color": "#f2f2f7",
+  "theme_color": "#f2f2f7",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cokcok1.github.io/hotline/hotline.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cokcok1.github.io/hotline/hotline.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
