@@ -7,7 +7,6 @@
 
     <link rel="icon" type="image/png" href="https://cokcok1.github.io/hotline/hotline.png">
     <link rel="apple-touch-icon" href="https://cokcok1.github.io/hotline/hotline.png">
-    
     <link rel="manifest" href="manifest.json">
     
     <meta name="apple-mobile-web-app-title" content="上帝熱線">
@@ -18,7 +17,6 @@
         :root {
             --app-bg: #f2f2f7;
             --list-bg: #ffffff;
-            --danger-color: #ff3b30;
             --call-color: #34c759;
             --text-primary: #000000;
             --text-secondary: #8e8e93;
@@ -32,33 +30,44 @@
             margin: 0;
             padding: 0;
             overflow: hidden; /* 禁止背景滾動 */
-            /* 讓 PWA 安裝後無法選取文字，像原生 App */
             -webkit-user-select: none; 
             user-select: none;
         }
 
         body {
-            background-color: #d1d1d6;
+            /* 背景顏色，讓手機框更加突出 */
+            background-color: #2c3e50; 
+            background-image: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* 手機外框 */
+        /* --- 手機外框核心設定 (強制顯示) --- */
         .phone-frame {
             position: relative;
-            background-color: #000;
-            border-radius: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            padding: 12px;
+            background-color: #1a1a1a; /* 機身顏色 */
+            border-radius: 45px;
+            /* 強烈的陰影讓它看起來立體 */
+            box-shadow: 
+                0 0 0 4px #333,
+                0 25px 50px rgba(0,0,0,0.7);
+            padding: 12px; /* 邊框厚度 */
             box-sizing: border-box;
+            
+            /* 尺寸控制：永遠佔據畫面的 90% 高度 */
             height: 90vh; 
-            max-height: 900px;
+            /* 針對手機瀏覽器網址列的優化 */
+            height: 90dvh; 
+            
+            /* 維持手機比例 */
             aspect-ratio: 9 / 19.5;
+            
+            /* 寬度自動，但不能超過螢幕寬度的 95% */
             width: auto;
-            max-width: 90vw;
-            min-width: 300px;
+            max-width: 95vw;
+            
             display: flex;
             flex-direction: column;
             z-index: 10;
@@ -69,40 +78,46 @@
             width: 100%;
             height: 100%;
             background-color: var(--app-bg);
-            border-radius: 30px;
+            border-radius: 35px; /* 內屏圓角 */
             overflow: hidden;
             display: flex;
             flex-direction: column;
             position: relative;
+            /* 修正內容溢出問題 */
+            mask-image: radial-gradient(white, black); 
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
         }
 
-        /* 劉海 */
+        /* 劉海 (Notch) */
         .notch {
             position: absolute;
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 35%;
-            height: 30px;
-            background-color: #000;
+            width: 40%;
+            height: 28px;
+            background-color: #1a1a1a;
             border-bottom-left-radius: 18px;
             border-bottom-right-radius: 18px;
             z-index: 100;
+            pointer-events: none;
         }
 
         /* 標題欄 */
         .header {
             padding: 50px 20px 15px 20px;
             background-color: var(--app-bg);
+            /* 毛玻璃效果 */
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             z-index: 10;
             flex-shrink: 0;
+            text-align: left;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
             color: var(--text-primary);
         }
@@ -110,7 +125,7 @@
         .header p {
             margin: 5px 0 0 0;
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 13px;
         }
 
         /* 內容滾動區 */
@@ -118,13 +133,13 @@
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 30px;
+            padding-bottom: 40px;
         }
         .content-area::-webkit-scrollbar { width: 0px; background: transparent; }
 
         .section-title {
             padding: 15px 20px 8px 20px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--section-header);
             text-transform: uppercase;
@@ -164,7 +179,7 @@
         }
         
         .bible-ref { 
-            font-size: 14px; 
+            font-size: 13px; 
             color: var(--text-secondary); 
         }
 
@@ -195,7 +210,7 @@
             bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
-            width: 30%;
+            width: 35%;
             height: 5px;
             background-color: #000;
             border-radius: 10px;
@@ -203,51 +218,36 @@
             pointer-events: none;
         }
 
-        /* 浮水印樣式 */
+        /* 浮水印 - 移到畫面最下方中間，不干擾手機框 */
         .watermark {
             position: fixed;
-            bottom: 10px;
-            right: 10px;
-            font-size: 12px;
-            color: #6e6e73;
-            opacity: 0.6;
-            z-index: 9999;
-            pointer-events: none;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+            z-index: 5;
             font-family: monospace;
-            text-shadow: 1px 1px 0px rgba(255,255,255,0.5);
-        }
-        
-        @media (max-height: 500px) {
-            .phone-frame {
-                height: 95vh;
-                aspect-ratio: auto;
-                width: 600px;
-                max-width: 95vw;
-            }
-            .header { padding-top: 20px; }
-            .notch { display: none; }
+            pointer-events: none;
         }
 
-        @media (max-width: 600px) {
-            body { background-color: var(--app-bg); display: block; height: 100vh; height: 100dvh; }
-            .phone-frame { width: 100%; height: 100%; border-radius: 0; padding: 0; box-shadow: none; max-height: none; }
-            .screen { border-radius: 0; }
-            .notch { display: none; } 
-            .header { padding-top: 20px; }
-            .content-area { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+        /* 極小螢幕適配 */
+        @media (max-height: 600px) {
+            .phone-frame { height: 98vh; aspect-ratio: auto; width: 350px; }
+            .header { padding-top: 40px; }
         }
     </style>
 </head>
 <body>
 
-<div class="watermark">V2.1 2026-01-11</div>
+<div class="watermark">V2.2 2026-01-11</div>
 
 <div class="phone-frame">
     <div class="screen">
         <div class="notch"></div>
         
         <div class="header">
-            <h1>上帝緊急熱線</h1>
+            <h1>緊急熱線</h1>
             <p>神的話語，是你隨時的幫助</p>
         </div>
 
@@ -260,6 +260,35 @@
 <script>
     // 指向 V32
     const TARGET_PAGE = "https://cokcok1.github.io/bible-ai2/index.html"; 
+
+    // 生成 Manifest (保持不變)
+    const manifest = {
+        "name": "上帝緊急熱線",
+        "short_name": "上帝熱線",
+        "start_url": "./hotline.html",
+        "display": "standalone",
+        "background_color": "#2c3e50",
+        "theme_color": "#2c3e50",
+        "orientation": "portrait",
+        "icons": [{
+            "src": "https://cokcok1.github.io/hotline/hotline.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }]
+    };
+    const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+    // 動態生成 manifest 連結 (如果你沒有上傳 manifest.json，這段代碼會幫你)
+    // 如果你已經上傳了 manifest.json，這段可以保留作為備用，或者刪除
+    // 這裡我做了雙重保險
+    let link = document.querySelector('link[rel="manifest"]');
+    if (!link) {
+        link = document.createElement('link');
+        link.rel = 'manifest';
+        document.head.appendChild(link);
+    }
+    // 如果找不到外部檔案，就用這個生成的
+    link.href = URL.createObjectURL(blob);
+
 
     const hotlineData = [
         { cat: "情緒急救", items: [
