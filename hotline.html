@@ -18,6 +18,7 @@
             --app-bg: #f2f2f7;
             --list-bg: #ffffff;
             --call-color: #34c759;
+            --video-color: #34c759;
             --text-primary: #000000;
             --text-secondary: #8e8e93;
             --border-color: #c6c6c8;
@@ -43,24 +44,21 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* --- 手機外框核心設定 (強制顯示) --- */
+        /* --- 手機外框核心設定 --- */
         .phone-frame {
             position: relative;
-            background-color: #1a1a1a; /* 機身顏色：黑色 */
+            background-color: #1a1a1a;
             border-radius: 45px;
             box-shadow: 
                 0 0 0 2px #333,
                 0 20px 40px rgba(0,0,0,0.4);
             padding: 12px;
             box-sizing: border-box;
-            
-            /* 尺寸控制 */
             height: 90vh; 
             height: 90dvh; 
             aspect-ratio: 9 / 19.5;
             width: auto;
             max-width: 95vw;
-            
             display: flex;
             flex-direction: column;
             z-index: 10;
@@ -80,7 +78,7 @@
             -webkit-mask-image: -webkit-radial-gradient(white, black);
         }
 
-        /* 劉海 (Notch) */
+        /* 劉海 */
         .notch {
             position: absolute;
             top: 0;
@@ -209,7 +207,6 @@
             pointer-events: none;
         }
 
-        /* 浮水印 */
         .watermark {
             position: fixed;
             bottom: 15px;
@@ -230,7 +227,7 @@
 </head>
 <body>
 
-<div class="watermark">V2.4 2026-01-12</div>
+<div class="watermark">V2.6 2026-01-12</div>
 
 <div class="phone-frame">
     <div class="screen">
@@ -250,7 +247,6 @@
 <script>
     const TARGET_PAGE = "https://cokcok1.github.io/bible-ai2/index.html"; 
 
-    // 生成 Manifest
     const manifest = {
         "name": "上帝緊急熱線",
         "short_name": "上帝熱線",
@@ -274,8 +270,23 @@
     }
     link.href = URL.createObjectURL(blob);
 
-
     const hotlineData = [
+        // --- 新增分類：講道和靈修 ---
+        { cat: "講道和靈修", items: [
+            { 
+                title: "同心電台", 
+                ref: "詩歌靈修清談節目", 
+                url: "https://youtube.com/playlist?list=PLOYShA7HDKEgpuHrz8GAlasEnigdQH3xq&si=UFWWdSezX-L7YUd5",
+                type: "video" 
+            },
+            { 
+                title: "基督教廣播頻道", 
+                ref: "Johnson Ng", 
+                url: "https://youtube.com/@johnsonng?si=uhfUpyDeTZdJXVKX",
+                type: "video" 
+            }
+        ]},
+        // ---------------------------
         { cat: "情緒急救", items: [
             { title: "當你憂傷時", ref: "約翰福音", ch: 14, start: "all" },
             { title: "當你又孤單又懼怕時", ref: "詩篇", ch: 23, start: "all" },
@@ -330,27 +341,38 @@
                 const li = document.createElement('li');
                 li.className = 'contact-item';
 
-                let refDisplay = `${item.ref} ${item.ch}`;
-                if (item.start !== 'all') {
-                    refDisplay += `:${item.start}`;
-                    if (item.end && item.end !== item.start) refDisplay += `-${item.end}`;
+                // --- 渲染邏輯 ---
+                let refDisplay, url, iconSvg;
+
+                if (item.type === 'video') {
+                    // ** 視像電話邏輯 **
+                    refDisplay = item.ref;
+                    url = item.url;
+                    // 攝錄機 Icon
+                    iconSvg = `<svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>`;
                 } else {
-                    refDisplay += "章";
+                    // ** 經文撥號邏輯 **
+                    refDisplay = `${item.ref} ${item.ch}`;
+                    if (item.start !== 'all') {
+                        refDisplay += `:${item.start}`;
+                        if (item.end && item.end !== item.start) refDisplay += `-${item.end}`;
+                    } else {
+                        refDisplay += "章";
+                    }
+
+                    let bookParam = item.ref;
+                    if(bookParam === "約書亞書") bookParam = "約書亞記"; 
+
+                    url = `${TARGET_PAGE}?book=${encodeURIComponent(bookParam)}&chap=${item.ch}`;
+                    if(item.start !== 'all') {
+                        url += `&start=${item.start}`;
+                        if(item.end) url += `&end=${item.end}`;
+                    } else {
+                        url += `&start=all`;
+                    }
+                    // 電話筒 Icon
+                    iconSvg = `<svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.98a1 1 0 00-1-.98h-2.9A1 1 0 003.68 4.02C4 13.29 11.71 21 20.98 21.32a1 1 0 001.02-1v-2.94a1 1 0 00-.99-1z"/></svg>`;
                 }
-
-                let bookParam = item.ref;
-                if(bookParam === "約書亞書") bookParam = "約書亞記"; 
-
-                // V2.4 修改：移除 &auto=gemini
-                let url = `${TARGET_PAGE}?book=${encodeURIComponent(bookParam)}&chap=${item.ch}`;
-                if(item.start !== 'all') {
-                    url += `&start=${item.start}`;
-                    if(item.end) url += `&end=${item.end}`;
-                } else {
-                    url += `&start=all`;
-                }
-
-                const phoneIcon = `<svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.98a1 1 0 00-1-.98h-2.9A1 1 0 003.68 4.02C4 13.29 11.71 21 20.98 21.32a1 1 0 001.02-1v-2.94a1 1 0 00-.99-1z"/></svg>`;
 
                 li.onclick = () => window.open(url, '_blank');
 
@@ -359,7 +381,7 @@
                         <div class="situation">${item.title}</div>
                         <div class="bible-ref">${refDisplay}</div>
                     </div>
-                    <a href="${url}" class="call-btn" target="_blank" onclick="event.stopPropagation()">${phoneIcon}</a>
+                    <a href="${url}" class="call-btn" target="_blank" onclick="event.stopPropagation()">${iconSvg}</a>
                 `;
                 ul.appendChild(li);
             });
