@@ -17,20 +17,19 @@
         }
 
         body {
-            background-color: #d1d1d6; /* 桌面背景色 */
+            background-color: #d1d1d6;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            /* 防止 iOS 彈性滾動導致背景穿幫 */
             overscroll-behavior-y: none;
         }
 
-        /* 手機外框 (模擬器) */
+        /* 手機外框 */
         .phone-frame {
-            width: 390px; /* iPhone 13/14 Pro 寬度 */
+            width: 390px;
             height: 844px;
             background-color: #000;
             border-radius: 50px;
@@ -38,7 +37,6 @@
             padding: 12px;
             box-sizing: border-box;
             position: relative;
-            /* 確保在小屏幕桌面也能顯示 */
             max-height: 95vh;
         }
 
@@ -54,7 +52,7 @@
             position: relative;
         }
 
-        /* 頂部劉海 (裝飾) */
+        /* 劉海 */
         .notch {
             position: absolute;
             top: 0;
@@ -68,11 +66,10 @@
             z-index: 100;
         }
 
-        /* App 標題欄 */
+        /* 標題欄 */
         .header {
             padding: 60px 20px 15px 20px;
             background-color: var(--app-bg);
-            /* 模擬毛玻璃效果標題 */
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             z-index: 10;
@@ -93,15 +90,13 @@
             font-weight: 400;
         }
 
-        /* 內容滾動區 */
+        /* 內容區 */
         .content-area {
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 40px; /* 底部留白 */
+            padding-bottom: 40px;
         }
-
-        /* 隱藏滾動條美觀化 */
         .content-area::-webkit-scrollbar { width: 0px; background: transparent; }
 
         .section-title {
@@ -126,7 +121,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 12px 20px;
-            margin-left: 20px; /* iOS 風格分隔線縮排 */
+            margin-left: 20px;
             padding-left: 0;
             border-bottom: 1px solid #e5e5ea;
             cursor: pointer;
@@ -145,14 +140,12 @@
             margin-bottom: 4px;
         }
         
-        /* 修改：直接顯示經文，顏色改為藍色或灰色，視乎喜好，這裡用灰色模仿 iOS 副標題 */
         .bible-ref { 
             font-size: 15px; 
             color: var(--text-secondary); 
             font-weight: 400;
         }
 
-        /* 撥號按鈕 */
         .call-btn {
             width: 32px;
             height: 32px;
@@ -167,7 +160,6 @@
             transition: all 0.2s;
         }
         
-        /* 模仿點擊效果：變實心綠 */
         .contact-item:active .call-btn, .call-btn:active {
             background-color: var(--call-color);
             border-color: var(--call-color);
@@ -176,7 +168,6 @@
 
         .call-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
-        /* 底部 Home Indicator */
         .home-indicator {
             position: absolute;
             bottom: 8px;
@@ -190,13 +181,13 @@
             pointer-events: none;
         }
 
-        /* --- 手機版適配 (Android/iOS 真機瀏覽) --- */
+        /* Android / 手機全螢幕適配 */
         @media (max-width: 600px) {
             body { 
                 background-color: var(--app-bg); 
                 display: block; 
-                height: 100vh; /* Fallback */
-                height: 100dvh; /* Dynamic Height 解決 Android 網址列問題 */
+                height: 100vh; 
+                height: 100dvh; 
             }
             .phone-frame { 
                 width: 100%; 
@@ -206,15 +197,13 @@
                 box-shadow: none; 
                 max-height: none;
             }
-            .screen { 
-                border-radius: 0; 
-            }
+            .screen { border-radius: 0; }
             .notch { display: none; } 
-            .header { padding-top: 20px; } /* 狀態列空間 */
+            .header { padding-top: 20px; }
             
-            /* 關鍵修正：底部增加 padding，防止被 Android 導航列遮擋 */
+            /* 底部防遮擋修正 */
             .content-area {
-                padding-bottom: 120px; /* 增加底部空間 */
+                padding-bottom: 120px;
                 padding-bottom: calc(100px + env(safe-area-inset-bottom));
             }
         }
@@ -239,10 +228,10 @@
 </div>
 
 <script>
-    // ★★★ 請確認這裡是指向你的 V2 頁面 ★★★
+    // ★★★ 請確認指向正確的查經頁面 (V2/V31) ★★★
     const TARGET_PAGE = "index.html"; 
 
-    // 根據你第一篇提供的完整資料進行分類
+    // 已根據你的要求更新並分類
     const hotlineData = [
         { cat: "情緒急救", items: [
             { title: "當你憂傷時", ref: "約翰福音", ch: 14, start: "all" },
@@ -251,37 +240,34 @@
             { title: "當你心情低落時", ref: "詩篇", ch: 27, start: "all" },
             { title: "當你失去盼望時", ref: "詩篇", ch: 126, start: "all" },
             { title: "當你受傷害心懷不平時", ref: "哥林多前書", ch: 13, start: "all" },
-            { title: "當你覺得被遺棄時", ref: "羅馬書", ch: 8, start: 31, end: 39 }
+            { title: "當你覺得被遺棄被隔絕時", ref: "羅馬書", ch: 8, start: 31, end: 39 },
+            { title: "當你尋找平安時", ref: "馬太福音", ch: 11, start: 25, end: 30 }
         ]},
-        { cat: "靈性危機", items: [
+        { cat: "靈性與信仰", items: [
             { title: "當你犯了罪", ref: "詩篇", ch: 51, start: "all" },
+            { title: "當你覺得上帝離你好遠", ref: "詩篇", ch: 139, start: "all" },
+            { title: "當你的信心需要鼓勵時", ref: "希伯來書", ch: 11, start: "all" },
             { title: "當你懷疑基督信仰時", ref: "哥林多後書", ch: 5, start: 15, end: 18 },
-            { title: "當你覺得世界比上帝大", ref: "詩篇", ch: 90, start: "all" },
-            { title: "當你覺得世界比你小", ref: "詩篇", ch: 19, start: "all" }
+            { title: "當你覺得世界比上帝更大時", ref: "詩篇", ch: 90, start: "all" },
+            { title: "當你覺得世界比你小時", ref: "詩篇", ch: 19, start: "all" },
+            { title: "當你為自己禱告時", ref: "詩篇", ch: 87, start: "all" },
+            { title: "使徒保羅擁有喜樂的秘訣", ref: "歌羅西書", ch: 3, start: 12, end: 17 }
         ]},
-        { cat: "尋求指引與保護", items: [
+        { cat: "生活與工作指引", items: [
             { title: "當你面對危難", ref: "詩篇", ch: 91, start: "all" },
             { title: "當你出門遠行時", ref: "詩篇", ch: 121, start: "all" },
-            { title: "需要勇氣完成工作", ref: "約書亞記", ch: 1, start: "all" },
-            { title: "當你尋找平安時", ref: "馬太福音", ch: 11, start: 25, end: 30 },
-            { title: "當你需要喜樂的秘訣", ref: "歌羅西書", ch: 3, start: 12, end: 17 },
-            { title: "當你碰到很好的機遇", ref: "以賽亞書", ch: 55, start: "all" }
+            { title: "當你需要勇氣去完成一項工作時", ref: "約書亞記", ch: 1, start: "all" },
+            { title: "當你為投資與通漲晝夜思慮時", ref: "馬可福音", ch: 10, start: 17, end: 31 },
+            { title: "當你的銀行戶口結餘是零時", ref: "詩篇", ch: 37, start: "all" },
+            { title: "當你需要基督好像需要保險時", ref: "羅馬書", ch: 8, start: 1, end: 30 },
+            { title: "當你碰到很好的機遇或洞察先機時", ref: "以賽亞書", ch: 55, start: "all" }
         ]},
-        { cat: "人際與生活", items: [
-            { title: "對所有人失去信心時", ref: "哥林多前書", ch: 13, start: "all" },
-            { title: "覺得周圍的人不友善", ref: "約翰福音", ch: 15, start: "all" },
-            { title: "想與其他人和睦相處", ref: "羅馬書", ch: 12, start: "all" },
-            { title: "希望結出果子時", ref: "約翰福音", ch: 15, start: "all" },
-            { title: "為投資與通漲思慮時", ref: "馬可福音", ch: 10, start: 17, end: 31 },
-            { title: "銀行戶口結餘是零時", ref: "詩篇", ch: 37, start: "all" },
-            { title: "需要基督像需要保險", ref: "羅馬書", ch: 8, start: 1, end: 30 },
-            { title: "當你為自己禱告時", ref: "詩篇", ch: 87, start: "all" }
-        ]},
-        { cat: "輔助號碼", items: [
-            { title: "面對驚恐", ref: "詩篇", ch: 3, start: 4, end: 7 },
-            { title: "尋求保護", ref: "詩篇", ch: 121, start: 3, end: 3 },
-            { title: "尋求保障", ref: "馬可福音", ch: 8, start: 35, end: 35 },
-            { title: "尋求雙重保障", ref: "詩篇", ch: 145, start: 18, end: 18 }
+        { cat: "人際關係", items: [
+            { title: "當所有人都令你失望", ref: "詩篇", ch: 27, start: "all" },
+            { title: "當你對所有人失去信心時", ref: "哥林多前書", ch: 13, start: "all" },
+            { title: "當你覺得周圍的人不友善時", ref: "約翰福音", ch: 15, start: "all" },
+            { title: "當你想與其他人和睦相處時", ref: "羅馬書", ch: 12, start: "all" },
+            { title: "當你希望結出果子時", ref: "約翰福音", ch: 15, start: "all" }
         ]}
     ];
 
@@ -289,13 +275,11 @@
         const container = document.getElementById('listContainer');
         
         hotlineData.forEach(category => {
-            // 分類標題
             const catTitle = document.createElement('div');
             catTitle.className = 'section-title';
             catTitle.innerText = category.cat;
             container.appendChild(catTitle);
 
-            // 列表容器
             const ul = document.createElement('ul');
             ul.className = 'contact-list';
 
@@ -303,7 +287,7 @@
                 const li = document.createElement('li');
                 li.className = 'contact-item';
 
-                // 構建顯示文字：例如 "詩篇 51章" 或 "馬太福音 8:19-34"
+                // 顯示文字
                 let refDisplay = `${item.ref} ${item.ch}`;
                 if (item.start !== 'all') {
                     refDisplay += `:${item.start}`;
@@ -312,8 +296,11 @@
                     refDisplay += "章";
                 }
 
-                // 構建跳轉 URL
-                let url = `${TARGET_PAGE}?book=${encodeURIComponent(item.ref)}&chap=${item.ch}&auto=gemini`;
+                // URL 參數 (注意: "約書亞書" 在顯示時保留，但連結使用 "約書亞記" 以符合資料庫)
+                let bookParam = item.ref;
+                if(bookParam === "約書亞書") bookParam = "約書亞記"; 
+
+                let url = `${TARGET_PAGE}?book=${encodeURIComponent(bookParam)}&chap=${item.ch}&auto=gemini`;
                 if(item.start !== 'all') {
                     url += `&start=${item.start}`;
                     if(item.end) url += `&end=${item.end}`;
@@ -321,10 +308,8 @@
                     url += `&start=all`;
                 }
 
-                // 電話圖示 SVG
                 const phoneIcon = `<svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.98a1 1 0 00-1-.98h-2.9A1 1 0 003.68 4.02C4 13.29 11.71 21 20.98 21.32a1 1 0 001.02-1v-2.94a1 1 0 00-.99-1z"/></svg>`;
 
-                // 點擊整行都能跳轉
                 li.onclick = () => window.open(url, '_blank');
 
                 li.innerHTML = `
