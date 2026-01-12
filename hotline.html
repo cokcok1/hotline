@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>上帝緊急熱線</title>
+
+    <link rel="icon" type="image/png" href="https://cokcok1.github.io/hotline/hotline.png">
+    <link rel="apple-touch-icon" href="https://cokcok1.github.io/hotline/hotline.png">
+    
+    <meta name="apple-mobile-web-app-title" content="上帝緊急熱線">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <link id="dynamic-manifest" rel="manifest">
+
+    <style>
+        :root {
+            --app-bg: #f2f2f7;
+            --list-bg: #ffffff;
+            --danger-color: #ff3b30;
+            --call-color: #34c759;
+            --text-primary: #000000;
+            --text-secondary: #8e8e93;
+            --border-color: #c6c6c8;
+            --section-header: #6e6e73;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* 禁止背景滾動 */
+        }
+
+        body {
+            background-color: #d1d1d6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* 手機外框 */
+        .phone-frame {
+            position: relative;
+            background-color: #000;
+            border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            padding: 12px;
+            box-sizing: border-box;
+            height: 90vh; 
+            max-height: 900px;
+            aspect-ratio: 9 / 19.5;
+            width: auto;
+            max-width: 90vw;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        /* 屏幕區域 */
+        .screen {
+            width: 100%;
+            height: 100%;
+            background-color: var(--app-bg);
+            border-radius: 30px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 劉海 */
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 35%;
+            height: 30px;
+            background-color: #000;
+            border-bottom-left-radius: 18px;
+            border-bottom-right-radius: 18px;
+            z-index: 100;
+        }
+
+        /* 標題欄 */
+        .header {
+            padding: 50px 20px 15px 20px;
+            background-color: var(--app-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .header p {
+            margin: 5px 0 0 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* 內容滾動區 */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 30px;
+        }
+        .content-area::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        .section-title {
+            padding: 15px 20px 8px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--section-header);
+            text-transform: uppercase;
+        }
+
+        .contact-list {
+            background-color: var(--list-bg);
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            margin-left: 20px;
+            padding-left: 0;
+            border-bottom: 1px solid #e5e5ea;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .contact-item:last-child { border-bottom: none; }
+        .contact-item:active { background-color: #e5e5ea; }
+
+        .info { flex: 1; padding-right: 10px; }
+        
+        .situation { 
+            font-size: 16px; 
+            font-weight: 400; 
+            color: var(--text-primary);
+            margin-bottom: 3px;
+        }
+        
+        .bible-ref { 
+            font-size: 14px; 
+            color: var(--text-secondary); 
+        }
+
+        .call-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: transparent;
+            border: 1px solid #d1d1d6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--call-color);
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        
+        .contact-item:active .call-btn, .call-btn:active {
+            background-color: var(--call-color);
+            border-color: var(--call-color);
+            color: white;
+        }
+
+        .call-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+        .home-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30%;
+            height: 5px;
+            background-color: #000;
+            border-radius: 10px;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        /* 浮水印樣式 */
+        .watermark {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: #6e6e73;
+            opacity: 0.6;
+            z-index: 9999;
+            pointer-events: none; /* 讓點擊穿透，不影響操作 */
+            font-family: monospace;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.5);
+        }
+        
+        @media (max-height: 500px) {
+            .phone-frame {
+                height: 95vh;
+                aspect-ratio: auto;
+                width: 600px;
+                max-width: 95vw;
+            }
+            .header { padding-top: 20px; }
+            .notch { display: none; }
+        }
+
+        @media (max-width: 600px) {
+            body { background-color: var(--app-bg); display: block; height: 100vh; height: 100dvh; }
+            .phone-frame { width: 100%; height: 100%; border-radius: 0; padding: 0; box-shadow: none; max-height: none; }
+            .screen { border-radius: 0; }
+            .notch { display: none; } 
+            .header { padding-top: 20px; }
+            .content-area { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="watermark">V2.0 2026-01-11</div>
+
+<div class="phone-frame">
+    <div class="screen">
+        <div class="notch"></div>
+        
+        <div class="header">
+            <h1>上帝緊急熱線</h1>
+            <p>神的話語，是你隨時的幫助</p>
+        </div>
+
+        <div class="content-area" id="listContainer"></div>
+
+        <div class="home-indicator"></div>
+    </div>
+</div>
+
+<script>
+    // ★★★ 設定目標為 Bible-AI2 (V32) ★★★
+    const TARGET_PAGE = "https://cokcok1.github.io/bible-ai2/index.html"; 
+
+    // --- 自動生成 Manifest (讓 Android 也能安裝成 App) ---
+    const manifest = {
+        "name": "上帝緊急熱線",
+        "short_name": "上帝熱線",
+        "start_url": ".",
+        "display": "standalone",
+        "background_color": "#f2f2f7",
+        "theme_color": "#f2f2f7",
+        "icons": [{
+            "src": "https://cokcok1.github.io/hotline/hotline.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }]
+    };
+    const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+    document.getElementById('dynamic-manifest').href = URL.createObjectURL(blob);
+
+    // --- 資料列表 ---
+    const hotlineData = [
+        { cat: "情緒急救", items: [
+            { title: "當你憂傷時", ref: "約翰福音", ch: 14, start: "all" },
+            { title: "當你又孤單又懼怕時", ref: "詩篇", ch: 23, start: "all" },
+            { title: "當你擔憂時", ref: "馬太福音", ch: 8, start: 19, end: 34 },
+            { title: "當你心情低落時", ref: "詩篇", ch: 27, start: "all" },
+            { title: "當你失去盼望時", ref: "詩篇", ch: 126, start: "all" },
+            { title: "當你受傷害心懷不平時", ref: "哥林多前書", ch: 13, start: "all" },
+            { title: "當你覺得被遺棄被隔絕時", ref: "羅馬書", ch: 8, start: 31, end: 39 },
+            { title: "當你尋找平安時", ref: "馬太福音", ch: 11, start: 25, end: 30 }
+        ]},
+        { cat: "靈性與信仰", items: [
+            { title: "當你犯了罪", ref: "詩篇", ch: 51, start: "all" },
+            { title: "當你覺得上帝離你好遠", ref: "詩篇", ch: 139, start: "all" },
+            { title: "當你的信心需要鼓勵時", ref: "希伯來書", ch: 11, start: "all" },
+            { title: "當你懷疑基督信仰時", ref: "哥林多後書", ch: 5, start: 15, end: 18 },
+            { title: "當你覺得世界比上帝更大時", ref: "詩篇", ch: 90, start: "all" },
+            { title: "當你覺得世界比你小時", ref: "詩篇", ch: 19, start: "all" },
+            { title: "當你為自己禱告時", ref: "詩篇", ch: 87, start: "all" },
+            { title: "使徒保羅擁有喜樂的秘訣", ref: "歌羅西書", ch: 3, start: 12, end: 17 }
+        ]},
+        { cat: "生活與工作指引", items: [
+            { title: "當你面對危難", ref: "詩篇", ch: 91, start: "all" },
+            { title: "當你出門遠行時", ref: "詩篇", ch: 121, start: "all" },
+            { title: "當你需要勇氣去完成一項工作時", ref: "約書亞記", ch: 1, start: "all" },
+            { title: "當你為投資與通漲晝夜思慮時", ref: "馬可福音", ch: 10, start: 17, end: 31 },
+            { title: "當你的銀行戶口結餘是零時", ref: "詩篇", ch: 37, start: "all" },
+            { title: "當你需要基督好像需要保險時", ref: "羅馬書", ch: 8, start: 1, end: 30 },
+            { title: "當你碰到很好的機遇或洞察先機時", ref: "以賽亞書", ch: 55, start: "all" }
+        ]},
+        { cat: "人際關係", items: [
+            { title: "當所有人都令你失望", ref: "詩篇", ch: 27, start: "all" },
+            { title: "當你對所有人失去信心時", ref: "哥林多前書", ch: 13, start: "all" },
+            { title: "當你覺得周圍的人不友善時", ref: "約翰福音", ch: 15, start: "all" },
+            { title: "當你想與其他人和睦相處時", ref: "羅馬書", ch: 12, start: "all" },
+            { title: "當你希望結出果子時", ref: "約翰福音", ch: 15, start: "all" }
+        ]}
+    ];
+
+    function renderApp() {
+        const container = document.getElementById('listContainer');
+        
+        hotlineData.forEach(category => {
+            const catTitle = document.createElement('div');
+            catTitle.className = 'section-title';
+            catTitle.innerText = category.cat;
+            container.appendChild(catTitle);
+
+            const ul = document.createElement('ul');
+            ul.className = 'contact-list';
+
+            category.items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'contact-item';
+
+                let refDisplay = `${item.ref} ${item.ch}`;
+                if (item.start !== 'all') {
+                    refDisplay += `:${item.start}`;
+                    if (item.end && item.end !== item.start) refDisplay += `-${item.end}`;
+                } else {
+                    refDisplay += "章";
+                }
+
+                let bookParam = item.ref;
+                if(bookParam === "約書亞書") bookParam = "約書亞記"; 
+
+                let url = `${TARGET_PAGE}?book=${encodeURIComponent(bookParam)}&chap=${item.ch}&auto=gemini`;
+                if(item.start !== 'all') {
+                    url += `&start=${item.start}`;
+                    if(item.end) url += `&end=${item.end}`;
+                } else {
+                    url += `&start=all`;
+                }
+
+                const phoneIcon = `<svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.98a1 1 0 00-1-.98h-2.9A1 1 0 003.68 4.02C4 13.29 11.71 21 20.98 21.32a1 1 0 001.02-1v-2.94a1 1 0 00-.99-1z"/></svg>`;
+
+                li.onclick = () => window.open(url, '_blank');
+
+                li.innerHTML = `
+                    <div class="info">
+                        <div class="situation">${item.title}</div>
+                        <div class="bible-ref">${refDisplay}</div>
+                    </div>
+                    <a href="${url}" class="call-btn" target="_blank" onclick="event.stopPropagation()">${phoneIcon}</a>
+                `;
+                ul.appendChild(li);
+            });
+            container.appendChild(ul);
+        });
+    }
+
+    renderApp();
+</script>
+
+</body>
+</html>
