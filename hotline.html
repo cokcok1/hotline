@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聖經緊急救援熱線 ✆</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --primary: #e74c3c; /* 緊急紅 */
+            --secondary: #2ecc71; /* 撥號綠 */
+            --accent: #3498db;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        h1 { margin: 0; font-size: 1.8rem; }
+        p { margin-top: 5px; opacity: 0.9; }
+
+        .emergency-list {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            gap: 15px;
+        }
+
+        .list-item {
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+            border-left: 5px solid transparent;
+        }
+
+        .list-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* 根據類別不同顏色 */
+        .list-item.comfort { border-left-color: #f1c40f; }
+        .list-item.danger { border-left-color: #e74c3c; }
+        .list-item.faith { border-left-color: #3498db; }
+        .list-item.aux { border-left-color: #9b59b6; background-color: #fcfcfc; }
+
+        .situation {
+            font-weight: 600;
+            font-size: 1.05rem;
+            flex: 1;
+        }
+
+        .reference {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-right: 15px;
+            display: none; /* 手機版隱藏經文出處，只顯示撥號 */
+        }
+        @media(min-width: 600px) { .reference { display: block; } }
+
+        .dial-btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+
+        .dial-btn:hover {
+            background-color: #27ae60;
+            box-shadow: 0 2px 8px rgba(46, 204, 113, 0.4);
+        }
+
+        .dial-icon { font-size: 1.2rem; }
+
+        .section-title {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: var(--accent);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>聖經緊急救援熱線</h1>
+        <p>這些號碼比起 911 更有效</p>
+    </header>
+
+    <div id="appContent"></div>
+    
+    <p style="text-align:center; color:#999; margin-top:30px; font-size:0.8rem;">
+        點擊撥號後將自動連結至查經系統並由 AI 解讀
+    </p>
+</div>
+
+<script>
+    // 設定你的查經網頁網址 (請確保結尾沒有 slash 或 index.html，程式會自動處理)
+    // 這裡使用你提供的網址
+    const BASE_URL = "https://cokcok1.github.io/bible-ai3"; 
+
+    const data = [
+        { type: "comfort", title: "當你憂傷時", ref: "約翰福音", ch: 14, vStart: "all", vEnd: null },
+        { type: "danger", title: "當你犯了罪", ref: "詩篇", ch: 51, vStart: "all", vEnd: null },
+        { type: "danger", title: "當你面對危難", ref: "詩篇", ch: 91, vStart: "all", vEnd: null },
+        { type: "comfort", title: "當所有人都令你失望", ref: "詩篇", ch: 139, vStart: "all", vEnd: null },
+        { type: "faith", title: "當你的信心需要鼓勵時", ref: "希伯來書", ch: 11, vStart: "all", vEnd: null },
+        { type: "comfort", title: "當你又孤單又懼怕時", ref: "詩篇", ch: 23, vStart: "all", vEnd: null },
+        { type: "comfort", title: "當你擔憂時", ref: "馬太福音", ch: 8, vStart: 19, vEnd: 34 },
+        { type: "comfort", title: "當你受傷害心懷不平時", ref: "哥林多前書", ch: 13, vStart: "all", vEnd: null },
+        { type: "faith", title: "當你懷疑基督信仰時", ref: "哥林多後書", ch: 5, vStart: 15, vEnd: 18 },
+        { type: "comfort", title: "當你覺得被遺棄、被隔絕時", ref: "羅馬書", ch: 8, vStart: 31, vEnd: 39 },
+        { type: "comfort", title: "當你尋找平安時", ref: "馬太福音", ch: 11, vStart: 25, vEnd: 30 },
+        { type: "faith", title: "當你覺得世界比上帝更大時", ref: "詩篇", ch: 90, vStart: "all", vEnd: null },
+        { type: "faith", title: "當你需要基督，像需要保險時", ref: "羅馬書", ch: 8, vStart: 1, vEnd: 30 },
+        { type: "danger", title: "當你出門遠行時", ref: "詩篇", ch: 121, vStart: "all", vEnd: null },
+        { type: "faith", title: "當你為自己禱告時", ref: "詩篇", ch: 87, vStart: "all", vEnd: null },
+        { type: "faith", title: "當你需要勇氣去完成一項工作時", ref: "約書亞記", ch: 1, vStart: "all", vEnd: null },
+        { type: "danger", title: "當你為投資與通漲晝夜思慮時", ref: "馬可福音", ch: 10, vStart: 17, vEnd: 31 },
+        { type: "comfort", title: "當你心情低落時", ref: "詩篇", ch: 27, vStart: "all", vEnd: null },
+        { type: "danger", title: "當你的銀行戶口結餘是零時", ref: "詩篇", ch: 37, vStart: "all", vEnd: null },
+        { type: "comfort", title: "當你對所有人失去信心時", ref: "哥林多前書", ch: 13, vStart: "all", vEnd: null },
+        { type: "comfort", title: "當你覺得周圍的人不友善時", ref: "約翰福音", ch: 15, vStart: "all", vEnd: null },
+        { type: "comfort", title: "當你失去盼望時", ref: "詩篇", ch: 126, vStart: "all", vEnd: null },
+        { type: "faith", title: "當你覺得世界比你小時", ref: "詩篇", ch: 19, vStart: "all", vEnd: null },
+        { type: "faith", title: "當你希望結出果子時", ref: "約翰福音", ch: 15, vStart: "all", vEnd: null },
+        { type: "faith", title: "當你需要喜樂的秘訣", ref: "歌羅西書", ch: 3, vStart: 12, vEnd: 17 },
+        { type: "faith", title: "當你碰到很好的機遇", ref: "以賽亞書", ch: 55, vStart: "all", vEnd: null },
+        { type: "faith", title: "當你想與其他人和睦相處時", ref: "羅馬書", ch: 12, vStart: "all", vEnd: null }
+    ];
+
+    const auxData = [
+        // 修正經文：詩篇 3 只有 8 節，推測為 3:4-7
+        { type: "aux", title: "面對驚恐", ref: "詩篇", ch: 3, vStart: 4, vEnd: 7 }, 
+        { type: "aux", title: "尋求保護", ref: "詩篇", ch: 121, vStart: 3, vEnd: 3 },
+        { type: "aux", title: "尋求保障", ref: "馬可福音", ch: 8, vStart: 35, vEnd: 35 },
+        // 修正經文：詩篇 145:18
+        { type: "aux", title: "尋求雙重保障", ref: "詩篇", ch: 145, vStart: 18, vEnd: 18 }
+    ];
+
+    function renderList(items, containerId) {
+        const ul = document.createElement('ul');
+        ul.className = 'emergency-list';
+        
+        items.forEach(item => {
+            const li = document.createElement('li');
+            li.className = `list-item ${item.type}`;
+            
+            // 構建 URL 參數
+            // 參數格式：?book=約翰福音&chap=14&start=all&auto=gemini
+            let params = `?book=${encodeURIComponent(item.ref)}&chap=${item.ch}&auto=gemini`;
+            if (item.vStart !== "all") {
+                params += `&start=${item.vStart}`;
+                if (item.vEnd) params += `&end=${item.vEnd}`;
+            } else {
+                params += `&start=all`;
+            }
+
+            const finalUrl = `${BASE_URL}/index.html${params}`;
+            
+            // 顯示經文格式
+            let refDisplay = `${item.ref} ${item.ch}`;
+            if (item.vStart !== "all") {
+                refDisplay += `:${item.vStart}`;
+                if (item.vEnd && item.vEnd !== item.vStart) refDisplay += `-${item.vEnd}`;
+            } else {
+                refDisplay += "章";
+            }
+
+            li.innerHTML = `
+                <div class="situation">${item.title}</div>
+                <div class="reference">＊${refDisplay}</div>
+                <a href="${finalUrl}" class="dial-btn" target="_blank">
+                    <span class="dial-icon">✆</span> 撥號
+                </a>
+            `;
+            ul.appendChild(li);
+        });
+        return ul;
+    }
+
+    const app = document.getElementById('appContent');
+    app.appendChild(renderList(data, 'appContent'));
+
+    const auxTitle = document.createElement('h3');
+    auxTitle.className = 'section-title';
+    auxTitle.innerText = '輔助號碼';
+    app.appendChild(auxTitle);
+    
+    app.appendChild(renderList(auxData, 'appContent'));
+
+</script>
+
+</body>
+</html>
