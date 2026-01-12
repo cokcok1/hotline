@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>聖經研讀 / Bible Study (V31)</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="bible-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="bible-icon.png">
+    <link rel="icon" type="image/png" href="bible-icon.png">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        :root {
+            --bg: #f0f2f5; 
+            --text: #333333;
+            --primary: #2c3e50;
+            --accent: #8e44ad;
+            
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.9);
+            --glass-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            
+            --input-bg: #ffffff;
+            --input-border: #cccccc;
+            --input-text: #333333;
+            --nav-btn-bg: #ffffff;
+            --nav-btn-color: #95a5a6;
+            
+            --scripture-size: 1.25rem;
+            --highlight-color: #f1c40f55;
+            --gemini-title-border: #f39c12;
+
+            --element-height: 52px; /* 統一高度 */
+        }
+
+        /* 深色模式 */
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --text: #e2e8f0;
+            --primary: #60a5fa;
+            --accent: #a78bfa;
+            
+            --glass-bg: rgba(30, 41, 59, 0.85); 
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            
+            --input-bg: #1e293b;
+            --input-border: #475569;
+            --input-text: #ffffff;
+            --nav-btn-bg: #1e293b;
+            --nav-btn-color: #94a3b8;
+            
+            --highlight-color: #d9770688;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            color: var(--text);
+            padding-bottom: 120px;
+            -webkit-text-size-adjust: 100%;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        h1 { text-align: center; color: var(--primary); font-size: 1.5rem; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 15px; }
+
+        /* V30: 語言切換按鈕區 */
+        .lang-switch-row {
+            display: flex; justify-content: center; gap: 10px; margin-bottom: 15px;
+        }
+        .lang-btn {
+            padding: 5px 15px;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .lang-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* 載入狀態 */
+        .loading-container { text-align: center; margin: 10px 0 20px 0; }
+        .progress-bar { width: 100%; height: 10px; background: #ddd; border-radius: 5px; overflow: hidden; margin-top: 10px; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; }
+
+        /* 通用卡片 */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* 工具列 (V28 簡潔版) */
+        .tools-row { 
+            display: flex; gap: 10px; margin-bottom: 15px; align-items: center;
+        }
+        .search-input {
+            flex-grow: 1; height: var(--element-height); padding: 0 12px;
+            border: 1px solid var(--input-border); border-radius: 8px; font-size: 16px;
+            background: var(--input-bg); color: var(--input-text); box-sizing: border-box;
+        }
+        .tool-btn {
+            min-width: 44px; height: var(--element-height);
+            border: 1px solid var(--input-border); border-radius: 8px; 
+            background: var(--input-bg); color: var(--text);
+            font-weight: bold; font-size: 1.1rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; box-sizing: border-box;
+        }
+        .tool-btn:active { transform: scale(0.95); opacity: 0.8; }
+        .search-btn { background: var(--primary); color: white; border: none; }
+
+        /* 搜尋結果區 */
+        .search-results {
+            max-height: 300px; overflow-y: auto; display: none;
+            background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 8px;
+            margin-bottom: 15px; padding: 10px; color: var(--text);
+        }
+        .result-item { padding: 10px; border-bottom: 1px solid var(--glass-border); cursor: pointer; }
+        .result-item:hover { background: rgba(128, 128, 128, 0.1); }
+        .result-ref { font-weight: bold; color: var(--accent); display: block; margin-bottom: 4px; }
+        .result-text { font-size: 0.9rem; opacity: 0.8; line-height: 1.5; }
+
+        /* 控制面板網格 */
+        .controls-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+            opacity: 0.5; pointer-events: none; transition: opacity 0.3s;
+        }
+        .controls-grid.active { opacity: 1; pointer-events: all; }
+        
+        .full-width { grid-column: 1 / -1; }
+        .verse-group { display: flex; align-items: center; gap: 5px; grid-column: 1 / -1; }
+        
+        select {
+            height: var(--element-height); padding: 0 12px;
+            border: 1px solid var(--input-border); border-radius: 8px;
+            font-size: 16px; width: 100%; 
+            background: var(--input-bg); color: var(--input-text); box-sizing: border-box;
+        }
+
+        .nav-row { grid-column: 1 / -1; display: flex; gap: 10px; margin-top: 5px; }
+        
+        /* 統一按鈕高度 */
+        .read-btn, .nav-btn, .ai-btn, .grok-btn, .copy-btn, .context-btn {
+            height: var(--element-height); box-sizing: border-box;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .read-btn {
+            flex-grow: 2; background-color: var(--primary); color: white; border: none;
+            border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;
+        }
+        .read-btn:hover { opacity: 0.9; }
+
+        .nav-btn {
+            flex-grow: 0; min-width: 60px;
+            background-color: var(--nav-btn-color); color: white; border: none;
+            border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer;
+        }
+        .nav-btn:hover { opacity: 0.8; }
+
+        /* 經文卡片 */
+        .scripture-card {
+            background: var(--glass-bg); padding: 25px; border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px;
+            display: none; 
+            border-left: 5px solid var(--accent);
+            position: relative;
+        }
+
+        /* 功能按鈕區 */
+        .action-area { 
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; 
+            align-items: stretch;
+        }
+        
+        .glass-btn {
+            width: 100%; padding: 5px; border-radius: 10px; border: none;
+            color: white; font-weight: 600; font-size: 0.85rem;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            white-space: normal; line-height: 1.2; text-align: center;
+        }
+        .glass-btn:active { transform: translateY(2px); }
+
+        .ai-btn { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); }
+        .grok-btn { background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); }
+        .copy-btn { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); }
+
+        .ref-title {
+            font-size: 1.3rem; font-weight: bold; color: var(--accent);
+            margin-bottom: 15px; border-bottom: 2px solid rgba(128,128,128,0.2); padding-bottom: 10px;
+        }
+        .scripture-text {
+            font-size: var(--scripture-size); 
+            line-height: 1.8; white-space: pre-wrap; color: var(--text);
+            margin-bottom: 20px;
+        }
+        .verse-num { color: #888; font-weight: normal; font-size: 0.8em; margin-right: 4px; }
+
+        /* 閱讀整章按鈕 */
+        .context-btn {
+            width: 100%; margin-top: 10px; margin-bottom: 20px; border-radius: 10px; border: none;
+            color: white; font-weight: bold; font-size: 1rem; cursor: pointer;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+            display: none;
+        }
+        .context-btn:active { transform: translateY(2px); }
+
+        /* Gemini 區塊 */
+        .gemini-section {
+            display: none; 
+            background: var(--glass-bg);
+            padding: 25px; border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid var(--glass-border); 
+            margin-top: 20px; color: var(--text);
+        }
+        .gemini-header {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 1.2rem; font-weight: bold; color: var(--text);
+            margin-bottom: 10px; border-bottom: 2px solid var(--gemini-title-border); padding-bottom: 10px;
+        }
+        .gemini-content { font-size: 1.05rem; line-height: 1.7; color: var(--text); opacity: 0.9; }
+        .gemini-content h1, .gemini-content h2, .gemini-content h3 { 
+            color: var(--primary); margin-top: 15px; margin-bottom: 8px; font-size: 1.1em; 
+        }
+        .gemini-content p { margin-bottom: 10px; }
+        .gemini-content strong { color: #e74c3c; } 
+        [data-theme="dark"] .gemini-content strong { color: #ff6b6b; }
+        
+        .gemini-content ul { padding-left: 20px; margin-bottom: 10px; }
+
+        .ai-loading { text-align: center; padding: 20px; font-style: italic; color: #888; display: none; }
+        .ai-spinner {
+            display: inline-block; width: 20px; height: 20px;
+            border: 3px solid rgba(128,128,128,0.2); border-top: 3px solid var(--gemini-title-border);
+            border-radius: 50%; animation: spin 1s linear infinite; margin-right: 10px; vertical-align: middle;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .footer-note {
+            text-align: right; font-size: 0.75rem; color: #888;
+            border-top: 1px solid rgba(128,128,128,0.1); padding-top: 10px; font-style: italic;
+        }
+
+        @media (max-width: 600px) { 
+            .controls-grid { grid-template-columns: 1fr; } 
+            .action-area { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="glass-card main-control-card">
+        <h1 id="appTitle">📖 聖經研讀</h1>
+        
+        <div class="lang-switch-row">
+            <button class="lang-btn active" id="btnZH" onclick="switchLanguage('zh')">繁體中文</button>
+            <button class="lang-btn" id="btnEN" onclick="switchLanguage('en')">English</button>
+        </div>
+
+        <div class="subtitle" id="sourceLabel">資料來源：和合本繁體 (Github/cokcok1)</div>
+
+        <div id="loadingArea" class="loading-container">
+            <div id="loadingText">正在下載資料庫 (4.5MB)...</div>
+            <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+        </div>
+
+        <div class="tools-row" id="toolsRow" style="display:none;">
+            <input type="text" id="searchInput" class="search-input" placeholder="輸入關鍵字 (如: 愛人如己)">
+            <button class="tool-btn search-btn" onclick="searchBible()">🔍</button>
+        </div>
+
+        <div id="searchResults" class="search-results"></div>
+
+        <div id="controlGrid" class="controls-grid">
+            <select id="bookSelect" class="full-width" onchange="updateChapters()"><option>載入中...</option></select>
+            <select id="chapterSelect" class="full-width" onchange="updateStartVerses()"><option>-</option></select>
+            
+            <div class="verse-group">
+                <select id="startVerseSelect" class="full-width" onchange="updateEndVerses()"><option>-</option></select>
+                <span id="toLabel" style="display:none; padding: 0 5px;">至</span>
+                <select id="endVerseSelect" class="full-width" style="display:none;"><option>-</option></select>
+            </div>
+
+            <div class="nav-row">
+                <button class="nav-btn" id="prevBtn" onclick="prevChapter()" title="上一章">❮</button>
+                <button class="read-btn" id="readBtn" onclick="displayScripture()">閱讀經文</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextChapter()" title="下一章">❯</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultCard" class="scripture-card">
+        
+        <div id="actionArea" class="action-area">
+            <button class="glass-btn ai-btn" id="geminiBtn" onclick="callGeminiAPI()">✨ Gemini解經<br>(VPN/非香港用戶)</button>
+            <button class="glass-btn grok-btn" id="grokBtn" onclick="openGrok()">🚀 複製並前往Grok</button>
+            <button class="glass-btn copy-btn" id="copyBtn" onclick="copyPrompt()">📋 僅複製指令</button>
+        </div>
+
+        <div class="ref-title" id="displayRef"></div>
+        <div class="scripture-text" id="displayText"></div>
+
+        <button id="contextBtn" class="context-btn" onclick="switchToWholeChapter()">📖 閱讀整章 (顯示上下文)</button>
+
+        <div id="geminiSection" class="gemini-section">
+            <div class="gemini-header">
+                <span id="geminiHeader">🤖 Gemini 解讀</span>
+            </div>
+            <div id="aiLoading" class="ai-loading">
+                <div class="ai-spinner"></div> <span id="loadingMsg">正在連線 Google Gemini...</span>
+            </div>
+            <div id="geminiResult" class="gemini-content"></div>
+        </div>
+
+        <div class="footer-note" id="footerVer">Powered by Google Gemini AI. 內容只供參考 2026-01-03 (V31)</div>
+    </div>
+</div>
+
+<textarea id="hiddenPrompt" style="display:none;"></textarea>
+
+<script>
+    // --- Configuration ---
+    const GEMINI_API_URL = 'https://little-thunder-4b7b.imsklam1.workers.dev';
+    const BIBLE_URL_ZH = 'https://cokcok1.github.io/bible-ai/chinese_union_trad_trad.txt';
+    const BIBLE_URL_EN = 'https://cokcok1.github.io/bible-ai/kjv.txt';
+    
+    // --- Global State ---
+    let currentLang = 'zh'; // 'zh' or 'en'
+    let bibleData = {}; // Stores the currently loaded bible data
+    let bookOrder = []; // Stores book order for current bible
+    let currentFontSize = 1.25;
+
+    // --- Translations ---
+    const i18n = {
+        zh: {
+            title: "📖 聖經研讀",
+            source: "資料來源：和合本繁體 (Github/cokcok1)",
+            searchPlaceholder: "輸入關鍵字 (如: 愛人如己)",
+            readBtn: "閱讀經文",
+            wholeChapterBtn: "📖 閱讀整章 (顯示上下文)",
+            geminiBtn: "✨ Gemini 解經\n(VPN/非香港用戶)",
+            grokBtn: "🚀 複製並前往 Grok",
+            copyBtn: "📋 僅複製指令",
+            geminiHeader: "🤖 Gemini 解讀, 內容只供參考",
+            loadingMsg: "正在連線 Google Gemini 思考神學意涵...",
+            footer: "Powered by Google Gemini AI. 內容只供參考",
+            loadingText: "正在下載資料庫 (4.5MB)...",
+            parsingText: "解析結構中...",
+            searchLoading: "🔍 正在搜尋全本聖經...",
+            searchNoResult: "找不到關於「KEYWORD」的經文。",
+            searchResultInfo: "找到 COUNT 處經文 (點擊跳轉):",
+            closeBtn: "✕ 關閉",
+            bookLoading: "載入中...",
+            chapterPre: "第 ",
+            chapterSuf: " 章",
+            versePre: "第 ",
+            verseSuf: " 節",
+            wholeChapter: "整章 (Whole Chapter)",
+            to: "至",
+            alertSearch: "請輸入搜尋關鍵字",
+            alertRead: "請先閱讀經文",
+            copySuccess: "✅ 成功",
+            copyOriginal: "📋 僅複製指令",
+            copyGrokMsg: "✅ 指令已複製！\n即將打開 Grok，請在對話框按「貼上」(Ctrl+V) 即可。"
+        },
+        en: {
+            title: "📖 Bible Study",
+            source: "Source: King James Bible (Github/cokcok1)",
+            searchPlaceholder: "Enter keyword (e.g., Love)",
+            readBtn: "Read Scripture",
+            wholeChapterBtn: "📖 Read Whole Chapter (Context)",
+            geminiBtn: "✨ Gemini Explanation\n(VPN / Non-HK user)",
+            grokBtn: "🚀 Copy & Go to Grok",
+            copyBtn: "📋 Copy Prompt Only",
+            geminiHeader: "🤖 Explanation for reference only",
+            loadingMsg: "Connecting to Gemini for insights...",
+            footer: "Powered by Google Gemini AI. For reference only.",
+            loadingText: "Downloading Database (4.5MB)...",
+            parsingText: "Parsing structure...",
+            searchLoading: "🔍 Searching the whole Bible...",
+            searchNoResult: "No scriptures found for 'KEYWORD'.",
+            searchResultInfo: "Found COUNT scriptures (Click to jump):",
+            closeBtn: "✕ Close",
+            bookLoading: "Loading...",
+            chapterPre: "Chapter ",
+            chapterSuf: "",
+            versePre: "Verse ",
+            verseSuf: "",
+            wholeChapter: "Whole Chapter",
+            to: "to",
+            alertSearch: "Please enter a keyword",
+            alertRead: "Please select scripture first",
+            alertSearch: "Please enter a keyword",
+            alertRead: "Please select scripture first",
+            copySuccess: "✅ Success",
+            copyOriginal: "📋 Copy Prompt Only",
+            copyGrokMsg: "✅ Copied!\n Opening Grok, please paste (Ctrl+V) in the chat."
+        }
+    };
+
+    // --- Initialization ---
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Initial Load (Default Chinese)
+    window.onload = function() {
+        updateUIText();
+        loadBibleData(BIBLE_URL_ZH);
+    };
+
+    // --- Language Switching ---
+    function switchLanguage(lang) {
+        if (currentLang === lang) return;
+        currentLang = lang;
+        
+        // Update Buttons UI
+        document.getElementById('btnZH').className = lang === 'zh' ? 'lang-btn active' : 'lang-btn';
+        document.getElementById('btnEN').className = lang === 'en' ? 'lang-btn active' : 'lang-btn';
+        
+        // Update Text
+        updateUIText();
+        
+        // Reload Bible Data
+        const url = lang === 'zh' ? BIBLE_URL_ZH : BIBLE_URL_EN;
+        
+        // Reset UI State
+        document.getElementById('loadingArea').style.display = 'block';
+        document.getElementById('controlGrid').className = 'controls-grid'; // remove active
+        document.getElementById('toolsRow').style.display = 'none';
+        document.getElementById('resultCard').style.display = 'none';
+        document.getElementById('searchResults').style.display = 'none';
+        
+        loadBibleData(url);
+    }
+
+    function updateUIText() {
+        const t = i18n[currentLang];
+        document.getElementById('appTitle').innerText = t.title;
+        document.getElementById('sourceLabel').innerText = t.source;
+        document.getElementById('searchInput').placeholder = t.searchPlaceholder;
+        document.getElementById('readBtn').innerText = t.readBtn;
+        document.getElementById('contextBtn').innerText = t.wholeChapterBtn;
+        document.getElementById('geminiBtn').innerText = t.geminiBtn;
+        document.getElementById('grokBtn').innerText = t.grokBtn;
+        document.getElementById('copyBtn').innerText = t.copyBtn;
+        document.getElementById('geminiHeader').innerText = t.geminiHeader;
+        document.getElementById('loadingMsg').innerText = t.loadingMsg;
+        document.getElementById('footerVer').innerText = `${t.footer} ${today} (V31)`;
+        document.getElementById('loadingText').innerText = t.loadingText;
+        document.getElementById('toLabel').innerText = t.to;
+    }
+
+    // --- Data Loading ---
+    async function loadBibleData(url) {
+        try {
+            bibleData = {};
+            bookOrder = [];
+            
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Network Error");
+            
+            const reader = response.body.getReader();
+            const contentLength = +response.headers.get('Content-Length');
+            let receivedLength = 0;
+            let chunks = [];
+            
+            while(true) {
+                const {done, value} = await reader.read();
+                if (done) break;
+                chunks.push(value);
+                receivedLength += value.length;
+                if (contentLength) document.getElementById('progressFill').style.width = (receivedLength / contentLength * 100) + "%";
+            }
+            
+            document.getElementById('loadingText').innerText = i18n[currentLang].parsingText;
+            let text = new TextDecoder("utf-8").decode(concatUint8Arrays(chunks));
+            parseBibleText(text);
+            
+            document.getElementById('loadingArea').style.display = 'none';
+            document.getElementById('controlGrid').className += ' active';
+            document.getElementById('toolsRow').style.display = 'flex';
+            
+            initSelectors();
+
+            // *** 新增：檢查網址參數，處理自動跳轉與自動解經 ***
+            checkUrlParams();
+            
+        } catch (e) {
+            document.getElementById('loadingText').innerText = "Error: " + e.message;
+        }
+    }
+
+    // --- 新增功能：處理 URL 參數與自動化 ---
+    function checkUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        // decodeURIComponent 處理中文字符
+        const bookParam = params.get('book'); 
+        const chapParam = params.get('chap');
+        const startParam = params.get('start');
+        const endParam = params.get('end');
+        const autoParam = params.get('auto');
+
+        if (bookParam && chapParam && bibleData[bookParam]) {
+            // 設定書卷
+            bookSel.value = bookParam;
+            updateChapters();
+            
+            // 設定章節
+            if (bibleData[bookParam][chapParam]) {
+                chapSel.value = chapParam;
+                updateStartVerses();
+                
+                // 設定開始節
+                if (startParam) {
+                    if (startParam === 'all' || bibleData[bookParam][chapParam][startParam]) {
+                        startVerSel.value = startParam;
+                        updateEndVerses();
+                        
+                        // 設定結束節
+                        if (endParam && endParam !== 'null' && bibleData[bookParam][chapParam][endParam]) {
+                            endVerSel.value = endParam;
+                        }
+                    }
+                }
+                
+                // 顯示經文
+                displayScripture();
+
+                // 自動觸發 Gemini
+                if (autoParam === 'gemini') {
+                    // 滾動到結果區
+                    document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+                    // 延遲一點點以確保介面渲染完畢
+                    setTimeout(() => {
+                        callGeminiAPI();
+                    }, 800);
+                }
+            }
+        }
+    }
+
+    function concatUint8Arrays(arrays) {
+        let totalLength = arrays.reduce((acc, val) => acc + val.length, 0);
+        let result = new Uint8Array(totalLength);
+        let len = 0;
+        for (let arr of arrays) { result.set(arr, len); len += arr.length; }
+        return result;
+    }
+
+    function parseBibleText(rawText) {
+        const lines = rawText.split('\n');
+        const lineRegex = /^(.+?)\s+(\d+):(\d+)\s+(.*)$/;
+        
+        lines.forEach(line => {
+            line = line.trim();
+            if (!line) return;
+            const match = line.match(lineRegex);
+            if (match) {
+                const book = match[1];
+                const chapter = parseInt(match[2]);
+                const verse = parseInt(match[3]);
+                const content = match[4];
+                
+                if (!bibleData[book]) { 
+                    bibleData[book] = {}; 
+                    bookOrder.push(book); 
+                }
+                if (!bibleData[book][chapter]) { 
+                    bibleData[book][chapter] = {}; 
+                }
+                bibleData[book][chapter][verse] = content;
+            }
+        });
+    }
+
+    // --- Search Logic ---
+    function searchBible() {
+        const rawKeyword = document.getElementById('searchInput').value.trim();
+        const resultsDiv = document.getElementById('searchResults');
+        const t = i18n[currentLang];
+        
+        if (!rawKeyword) { alert(t.alertSearch); return; }
+        
+        let searchKey = rawKeyword;
+        if (currentLang === 'zh') {
+            searchKey = rawKeyword.replace(/\s+/g, '');
+        } else {
+            searchKey = rawKeyword.toLowerCase();
+        }
+        
+        if (searchKey.length < 1) return;
+
+        resultsDiv.style.display = 'block';
+        resultsDiv.innerHTML = `<div style="padding:10px; color:#888;">${t.searchLoading}</div>`;
+
+        setTimeout(() => {
+            let results = [];
+            let count = 0;
+            const maxResults = 100;
+
+            for (let book of bookOrder) {
+                for (let chap in bibleData[book]) {
+                    for (let ver in bibleData[book][chap]) {
+                        const originalText = bibleData[book][chap][ver];
+                        let compareText = originalText;
+                        
+                        if (currentLang === 'zh') {
+                            compareText = originalText.replace(/\s+/g, '');
+                        } else {
+                            compareText = originalText.toLowerCase();
+                        }
+                        
+                        if (compareText.includes(searchKey)) {
+                            results.push({ book, chap, ver, text: originalText });
+                            count++;
+                            if (count >= maxResults) break;
+                        }
+                    }
+                    if (count >= maxResults) break;
+                }
+                if (count >= maxResults) break;
+            }
+
+            if (results.length === 0) {
+                const msg = t.searchNoResult.replace('KEYWORD', rawKeyword);
+                resultsDiv.innerHTML = `<div style="padding:10px; color:var(--accent);">${msg}</div>`;
+            } else {
+                const infoMsg = t.searchResultInfo.replace('COUNT', results.length + (count >= maxResults ? '+' : ''));
+                let html = `<div style="padding:10px; border-bottom:1px solid var(--glass-border); color:var(--primary);">
+                    ${infoMsg}
+                    <button style="float:right; border:none; background:none; color:var(--text); opacity:0.6; cursor:pointer;" onclick="closeSearch()">${t.closeBtn}</button>
+                </div>`;
+                
+                let highlightRegex;
+                if (currentLang === 'zh') {
+                    const escaped = searchKey.split('').map(c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s*');
+                    highlightRegex = new RegExp(`(${escaped})`, 'g');
+                } else {
+                    const escaped = searchKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    highlightRegex = new RegExp(`(${escaped})`, 'gi');
+                }
+
+                results.forEach(res => {
+                    const highlighted = res.text.replace(highlightRegex, `<span style="background:var(--highlight-color); font-weight:bold;">$1</span>`);
+                    html += `<div class="result-item" onclick="jumpToScripture('${res.book}', ${res.chap}, ${res.ver})">
+                        <span class="result-ref">${res.book} ${res.chap}:${res.ver}</span>
+                        <div class="result-text">${highlighted}</div>
+                    </div>`;
+                });
+                resultsDiv.innerHTML = html;
+            }
+        }, 50);
+    }
+
+    function closeSearch() {
+        document.getElementById('searchResults').style.display = 'none';
+    }
+
+    function jumpToScripture(book, chap, ver) {
+        bookSel.value = book;
+        updateChapters();
+        chapSel.value = chap;
+        updateStartVerses();
+        startVerSel.value = ver;
+        updateEndVerses();
+        
+        document.getElementById('searchInput').value = '';
+        
+        displayScripture();
+        closeSearch();
+        document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // --- UI Logic (Selectors) ---
+    const bookSel = document.getElementById('bookSelect');
+    const chapSel = document.getElementById('chapterSelect');
+    const startVerSel = document.getElementById('startVerseSelect');
+    const endVerSel = document.getElementById('endVerseSelect');
+
+    function initSelectors() {
+        const t = i18n[currentLang];
+        bookSel.innerHTML = "";
+        bookOrder.forEach(bk => {
+            let op = document.createElement('option');
+            op.value = bk; op.text = bk; bookSel.add(op);
+        });
+        updateChapters();
+    }
+
+    function updateChapters() {
+        const t = i18n[currentLang];
+        const book = bookSel.value;
+        chapSel.innerHTML = "";
+        const chaps = Object.keys(bibleData[book]).map(Number).sort((a,b)=>a-b);
+        chaps.forEach(ch => {
+            let op = document.createElement('option');
+            op.value = ch; 
+            op.text = `${t.chapterPre}${ch}${t.chapterSuf}`; 
+            chapSel.add(op);
+        });
+        updateStartVerses();
+    }
+
+    function updateStartVerses() {
+        const t = i18n[currentLang];
+        const book = bookSel.value;
+        const chap = chapSel.value;
+        startVerSel.innerHTML = `<option value="all">${t.wholeChapter}</option>`;
+        if (bibleData[book] && bibleData[book][chap]) {
+            const verses = Object.keys(bibleData[book][chap]).map(Number).sort((a,b)=>a-b);
+            verses.forEach(v => {
+                let op = document.createElement('option');
+                op.value = v; 
+                op.text = `${t.versePre}${v}${t.verseSuf}`;
+                startVerSel.add(op);
+            });
+        }
+        updateEndVerses();
+    }
+
+    function updateEndVerses() {
+        const t = i18n[currentLang];
+        const startVal = startVerSel.value;
+        if (startVal === "all") {
+            document.getElementById('toLabel').style.display = "none";
+            endVerSel.style.display = "none";
+            return;
+        }
+        document.getElementById('toLabel').style.display = "block";
+        endVerSel.style.display = "block";
+        endVerSel.innerHTML = "";
+        const book = bookSel.value;
+        const chap = chapSel.value;
+        const startNum = parseInt(startVal);
+        if (bibleData[book] && bibleData[book][chap]) {
+            const verses = Object.keys(bibleData[book][chap]).map(Number).sort((a,b)=>a-b);
+            verses.forEach(v => {
+                if (v >= startNum) {
+                    let op = document.createElement('option');
+                    op.value = v; 
+                    op.text = `${t.versePre}${v}${t.verseSuf}`;
+                    endVerSel.add(op);
+                }
+            });
+        }
+    }
+
+    function nextChapter() {
+        const t = i18n[currentLang];
+        const currentBook = bookSel.value;
+        const currentChap = parseInt(chapSel.value);
+        if (bibleData[currentBook][currentChap + 1]) {
+            chapSel.value = currentChap + 1;
+        } else {
+            const bookIdx = bookOrder.indexOf(currentBook);
+            if (bookIdx < bookOrder.length - 1) {
+                const nextBook = bookOrder[bookIdx + 1];
+                bookSel.value = nextBook;
+                updateChapters();
+                chapSel.value = 1;
+            } else {
+                alert(currentLang === 'zh' ? "已經是最後一章了" : "This is the last chapter.");
+                return;
+            }
+        }
+        updateStartVerses(); displayScripture();
+    }
+
+    function prevChapter() {
+        const t = i18n[currentLang];
+        const currentBook = bookSel.value;
+        const currentChap = parseInt(chapSel.value);
+        if (currentChap > 1) {
+            chapSel.value = currentChap - 1;
+        } else {
+            const bookIdx = bookOrder.indexOf(currentBook);
+            if (bookIdx > 0) {
+                const prevBook = bookOrder[bookIdx - 1];
+                bookSel.value = prevBook;
+                updateChapters();
+                const chaps = Object.keys(bibleData[prevBook]).map(Number);
+                chapSel.value = Math.max(...chaps);
+            } else {
+                alert(currentLang === 'zh' ? "已經是第一章了" : "This is the first chapter.");
+                return;
+            }
+        }
+        updateStartVerses(); displayScripture();
+    }
+
+    function displayScripture() {
+        const t = i18n[currentLang];
+        document.getElementById('geminiSection').style.display = 'none';
+        document.getElementById('geminiResult').innerHTML = '';
+        
+        const book = bookSel.value;
+        const chap = chapSel.value;
+        const startVer = startVerSel.value;
+        let displayText = "";
+        let refText = "";
+        const contextBtn = document.getElementById('contextBtn');
+        
+        if (startVer === "all") {
+            refText = `${book} ${t.chapterPre}${chap}${t.chapterSuf}`;
+            const verses = bibleData[book][chap];
+            Object.keys(verses).map(Number).sort((a,b)=>a-b).forEach(v => {
+                displayText += `<span class='verse-num'>[${v}]</span>${verses[v]}\n`;
+            });
+            contextBtn.style.display = "none";
+        } else {
+            const startNum = parseInt(startVer);
+            const endNum = parseInt(endVerSel.value);
+            if (startNum === endNum) {
+                 refText = `${book} ${t.chapterPre}${chap}${t.chapterSuf} ${t.versePre}${startNum}${t.verseSuf}`;
+            } else {
+                 refText = `${book} ${t.chapterPre}${chap}${t.chapterSuf} ${t.versePre}${startNum}-${endNum}${t.verseSuf}`;
+            }
+            for (let i = startNum; i <= endNum; i++) {
+                if (bibleData[book][chap][i]) {
+                    displayText += `<span class='verse-num'>[${i}]</span>${bibleData[book][chap][i]}\n`;
+                }
+            }
+            contextBtn.style.display = "block";
+        }
+
+        document.getElementById('resultCard').style.display = 'block';
+        document.getElementById('displayRef').innerText = refText;
+        document.getElementById('displayText').innerHTML = displayText;
+        document.getElementById('actionArea').style.display = 'grid';
+
+        generateHiddenPrompt(refText);
+    }
+
+    function switchToWholeChapter() {
+        startVerSel.value = 'all';
+        updateEndVerses();
+        displayScripture();
+    }
+
+    // --- Prompt Generation ---
+    function generateHiddenPrompt(ref) {
+        let prompt = "";
+        if (currentLang === 'zh') {
+            prompt = `請用中文（繁體）並以正統基督教信仰和聖經真理為基礎，解釋聖經【${ref}】。
+
+請提供：
+- 【經文概要】概述此章內容與主要事件。
+- 【經文解釋】詳細闡述該節的含義。
+- 【屬靈應用】提供如何將此章的信息應用於信徒生活。`;
+        } else {
+            prompt = `Please provide an explanation of ${ref} in English, grounded in orthodox Christian faith and biblical truth.
+
+Please include the following: 
+- Scripture Overview: A summary of the chapter’s content and primary events.
+- Exegesis and Interpretation: A detailed breakdown and explanation of the specific verses.
+- Spiritual Application: Practical guidance on how to apply the message to a believer’s life.`;
+        }
+        document.getElementById('hiddenPrompt').value = prompt;
+    }
+
+    // --- Gemini API ---
+    async function callGeminiAPI() {
+        const prompt = document.getElementById('hiddenPrompt').value;
+        const t = i18n[currentLang];
+        
+        if(!prompt) { alert(t.alertRead); return; }
+        
+        const section = document.getElementById('geminiSection');
+        const loading = document.getElementById('aiLoading');
+        const result = document.getElementById('geminiResult');
+        
+        section.style.display = 'block';
+        loading.style.display = 'block';
+        result.innerHTML = '';
+        section.scrollIntoView({ behavior: 'smooth' });
+
+        try {
+            const payload = { contents: [{ parts: [{ text: prompt }] }] };
+            const response = await fetch(GEMINI_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error(`Cloudflare Error: ${response.status}`);
+            const data = await response.json();
+            if (data.error) throw new Error(data.error.message || "Google API Error");
+            if (!data.candidates || !data.candidates[0]) throw new Error("API Response Error");
+
+            const rawMarkdown = data.candidates[0].content.parts[0].text;
+            result.innerHTML = parseMarkdown(rawMarkdown);
+        } catch (error) {
+            result.innerHTML = `<span style="color:red; font-weight:bold;">Error: ${error.message}</span>`;
+            console.error(error);
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+
+    function parseMarkdown(text) {
+        let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+        html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+        html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+        html = html.replace(/^\* (.*$)/gim, '<li>$1</li>');
+        html = html.replace(/^\- (.*$)/gim, '<li>$1</li>');
+        html = html.replace(/\n{3,}/g, '\n\n');
+        html = html.replace(/(<\/h[1-3]>)\n+/g, '$1');
+        html = html.replace(/\n/g, '<br>');
+        return html;
+    }
+
+    function openGrok() {
+        const txt = document.getElementById('hiddenPrompt').value;
+        const t = i18n[currentLang];
+        if (!txt) { alert(t.alertRead); return; }
+        fallbackCopy(txt, () => {
+            alert(t.copyGrokMsg);
+            window.open('https://grok.com', '_blank');
+        });
+    }
+
+    function copyPrompt() {
+        const txt = document.getElementById('hiddenPrompt').value;
+        const t = i18n[currentLang];
+        if (!txt) return;
+        const onSuccess = () => {
+            const btn = document.getElementById('copyBtn');
+            const originalText = t.copyBtn;
+            btn.innerText = t.copySuccess;
+            btn.style.backgroundColor = "#27ae60";
+            setTimeout(() => { btn.innerText = originalText; btn.style.backgroundColor = ""; }, 2000);
+        };
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(txt).then(onSuccess).catch(() => fallbackCopy(txt, onSuccess));
+        } else {
+            fallbackCopy(txt, onSuccess);
+        }
+    }
+
+    function fallbackCopy(text, callback) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "absolute";
+        textArea.style.left = "-9999px";
+        textArea.setAttribute("readonly", "");
+        document.body.appendChild(textArea);
+        if (navigator.userAgent.match(/ipad|ipod|iphone/i)) {
+            const range = document.createRange();
+            range.selectNodeContents(textArea);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            textArea.setSelectionRange(0, 999999);
+        } else {
+            textArea.select();
+        }
+        try { if (document.execCommand('copy')) callback(); } 
+        catch (err) { console.error(err); }
+        document.body.removeChild(textArea);
+    }
+</script>
+
+</body>
+</html>
