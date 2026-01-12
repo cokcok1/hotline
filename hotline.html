@@ -8,11 +8,11 @@
     <link rel="icon" type="image/png" href="https://cokcok1.github.io/hotline/hotline.png">
     <link rel="apple-touch-icon" href="https://cokcok1.github.io/hotline/hotline.png">
     
-    <meta name="apple-mobile-web-app-title" content="上帝緊急熱線">
+    <link rel="manifest" href="manifest.json">
+    
+    <meta name="apple-mobile-web-app-title" content="上帝熱線">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <link id="dynamic-manifest" rel="manifest">
 
     <style>
         :root {
@@ -32,6 +32,9 @@
             margin: 0;
             padding: 0;
             overflow: hidden; /* 禁止背景滾動 */
+            /* 讓 PWA 安裝後無法選取文字，像原生 App */
+            -webkit-user-select: none; 
+            user-select: none;
         }
 
         body {
@@ -209,7 +212,7 @@
             color: #6e6e73;
             opacity: 0.6;
             z-index: 9999;
-            pointer-events: none; /* 讓點擊穿透，不影響操作 */
+            pointer-events: none;
             font-family: monospace;
             text-shadow: 1px 1px 0px rgba(255,255,255,0.5);
         }
@@ -237,7 +240,7 @@
 </head>
 <body>
 
-<div class="watermark">V2.0 2026-01-11</div>
+<div class="watermark">V2.1 2026-01-11</div>
 
 <div class="phone-frame">
     <div class="screen">
@@ -255,27 +258,9 @@
 </div>
 
 <script>
-    // ★★★ 設定目標為 Bible-AI2 (V32) ★★★
+    // 指向 V32
     const TARGET_PAGE = "https://cokcok1.github.io/bible-ai2/index.html"; 
 
-    // --- 自動生成 Manifest (讓 Android 也能安裝成 App) ---
-    const manifest = {
-        "name": "上帝緊急熱線",
-        "short_name": "上帝熱線",
-        "start_url": ".",
-        "display": "standalone",
-        "background_color": "#f2f2f7",
-        "theme_color": "#f2f2f7",
-        "icons": [{
-            "src": "https://cokcok1.github.io/hotline/hotline.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        }]
-    };
-    const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-    document.getElementById('dynamic-manifest').href = URL.createObjectURL(blob);
-
-    // --- 資料列表 ---
     const hotlineData = [
         { cat: "情緒急救", items: [
             { title: "當你憂傷時", ref: "約翰福音", ch: 14, start: "all" },
