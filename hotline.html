@@ -35,9 +35,10 @@
         }
 
         body {
-            /* 背景顏色，讓手機框更加突出 */
-            background-color: #2c3e50; 
-            background-image: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
+            /* 【修改點 1】背景顏色改為粉藍色，突顯手機框 */
+            background-color: #add8e6; 
+            /* background-image: linear-gradient(...)  <- 移除舊的深色漸變 */
+            
             display: flex;
             justify-content: center;
             align-items: center;
@@ -47,18 +48,17 @@
         /* --- 手機外框核心設定 (強制顯示) --- */
         .phone-frame {
             position: relative;
-            background-color: #1a1a1a; /* 機身顏色 */
+            background-color: #1a1a1a; /* 機身顏色：黑色 */
             border-radius: 45px;
-            /* 強烈的陰影讓它看起來立體 */
+            /* 調整陰影，使其在淺色背景上更立體 */
             box-shadow: 
-                0 0 0 4px #333,
-                0 25px 50px rgba(0,0,0,0.7);
+                0 0 0 2px #333,
+                0 20px 40px rgba(0,0,0,0.4);
             padding: 12px; /* 邊框厚度 */
             box-sizing: border-box;
             
             /* 尺寸控制：永遠佔據畫面的 90% 高度 */
             height: 90vh; 
-            /* 針對手機瀏覽器網址列的優化 */
             height: 90dvh; 
             
             /* 維持手機比例 */
@@ -218,14 +218,15 @@
             pointer-events: none;
         }
 
-        /* 浮水印 - 移到畫面最下方中間，不干擾手機框 */
+        /* 浮水印 - 移到畫面最下方中間 */
         .watermark {
             position: fixed;
             bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.3);
+            /* 【修改點 2】背景變淺，浮水印改為深色半透明 */
+            color: rgba(0, 0, 0, 0.3); 
             z-index: 5;
             font-family: monospace;
             pointer-events: none;
@@ -240,14 +241,14 @@
 </head>
 <body>
 
-<div class="watermark">V2.2 2026-01-11</div>
+<div class="watermark">V2.3 2026-01-11</div>
 
 <div class="phone-frame">
     <div class="screen">
         <div class="notch"></div>
         
         <div class="header">
-            <h1>緊急熱線</h1>
+            <h1>上帝緊急熱線</h1>
             <p>神的話語，是你隨時的幫助</p>
         </div>
 
@@ -277,16 +278,12 @@
         }]
     };
     const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-    // 動態生成 manifest 連結 (如果你沒有上傳 manifest.json，這段代碼會幫你)
-    // 如果你已經上傳了 manifest.json，這段可以保留作為備用，或者刪除
-    // 這裡我做了雙重保險
     let link = document.querySelector('link[rel="manifest"]');
     if (!link) {
         link = document.createElement('link');
         link.rel = 'manifest';
         document.head.appendChild(link);
     }
-    // 如果找不到外部檔案，就用這個生成的
     link.href = URL.createObjectURL(blob);
 
 
