@@ -16,28 +16,50 @@
             --section-header: #6e6e73;
         }
 
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* 禁止背景滾動，固定手機位置 */
+        }
+
         body {
             background-color: #d1d1d6;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overscroll-behavior-y: none;
         }
 
-        /* 手機外框 */
+        /* 手機外框核心設定 
+           使用 vh/vw (視窗百分比) 代替 px，確保在 iPad 橫向或手機上都能完整顯示
+        */
         .phone-frame {
-            width: 390px;
-            height: 844px;
-            background-color: #000;
-            border-radius: 50px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            padding: 12px;
-            box-sizing: border-box;
             position: relative;
-            max-height: 95vh;
+            background-color: #000;
+            border-radius: 40px; /* 圓角 */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            padding: 12px; /* 邊框厚度 */
+            box-sizing: border-box;
+            
+            /* 尺寸控制：佔據螢幕高度的 90% */
+            height: 90vh; 
+            max-height: 900px; /* 限制最大高度 */
+            
+            /* 維持手機比例 (9:19.5 是現代手機常見比例) */
+            aspect-ratio: 9 / 19.5;
+            
+            /* 寬度自動，但不能超過螢幕寬度的 90% */
+            width: auto;
+            max-width: 90vw;
+            
+            /* 防止在極窄螢幕變形 */
+            min-width: 300px;
+            
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
         }
 
         /* 屏幕區域 */
@@ -45,62 +67,63 @@
             width: 100%;
             height: 100%;
             background-color: var(--app-bg);
-            border-radius: 40px;
+            border-radius: 30px; /* 內屏圓角 */
             overflow: hidden;
             display: flex;
             flex-direction: column;
             position: relative;
         }
 
-        /* 劉海 */
+        /* 頂部劉海 */
         .notch {
             position: absolute;
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 120px;
-            height: 35px;
+            width: 35%; /* 相對寬度 */
+            height: 30px;
             background-color: #000;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
+            border-bottom-left-radius: 18px;
+            border-bottom-right-radius: 18px;
             z-index: 100;
         }
 
         /* 標題欄 */
         .header {
-            padding: 60px 20px 15px 20px;
+            padding: 50px 20px 15px 20px;
             background-color: var(--app-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             z-index: 10;
+            flex-shrink: 0; /* 防止被壓縮 */
         }
 
         .header h1 {
             margin: 0;
-            font-size: 34px;
+            font-size: 28px; /* 稍微調小以適應不同尺寸 */
             font-weight: 700;
             color: var(--text-primary);
-            letter-spacing: -0.5px;
         }
         
         .header p {
             margin: 5px 0 0 0;
             color: var(--text-secondary);
-            font-size: 15px;
-            font-weight: 400;
+            font-size: 14px;
         }
 
-        /* 內容區 */
+        /* 內容滾動區：只有這裡可以滑動 */
         .content-area {
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 40px;
+            padding-bottom: 30px;
         }
+        
+        /* 隱藏 Scrollbar */
         .content-area::-webkit-scrollbar { width: 0px; background: transparent; }
 
         .section-title {
-            padding: 20px 20px 8px 20px;
+            padding: 15px 20px 8px 20px;
             font-size: 13px;
             font-weight: 600;
             color: var(--section-header);
@@ -120,7 +143,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 20px;
+            padding: 12px 15px;
             margin-left: 20px;
             padding-left: 0;
             border-bottom: 1px solid #e5e5ea;
@@ -131,24 +154,24 @@
         .contact-item:last-child { border-bottom: none; }
         .contact-item:active { background-color: #e5e5ea; }
 
-        .info { flex: 1; padding-right: 15px; }
+        .info { flex: 1; padding-right: 10px; }
         
         .situation { 
-            font-size: 17px; 
+            font-size: 16px; 
             font-weight: 400; 
             color: var(--text-primary);
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
         
         .bible-ref { 
-            font-size: 15px; 
+            font-size: 14px; 
             color: var(--text-secondary); 
-            font-weight: 400;
         }
 
+        /* 撥號按鈕 */
         .call-btn {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             background-color: transparent;
             border: 1px solid #d1d1d6;
@@ -157,7 +180,7 @@
             align-items: center;
             color: var(--call-color);
             text-decoration: none;
-            transition: all 0.2s;
+            flex-shrink: 0;
         }
         
         .contact-item:active .call-btn, .call-btn:active {
@@ -166,46 +189,31 @@
             color: white;
         }
 
-        .call-btn svg { width: 18px; height: 18px; fill: currentColor; }
+        .call-btn svg { width: 16px; height: 16px; fill: currentColor; }
 
         .home-indicator {
             position: absolute;
             bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
-            width: 130px;
+            width: 30%;
             height: 5px;
             background-color: #000;
             border-radius: 10px;
             opacity: 0.2;
             pointer-events: none;
         }
-
-        /* Android / 手機全螢幕適配 */
-        @media (max-width: 600px) {
-            body { 
-                background-color: var(--app-bg); 
-                display: block; 
-                height: 100vh; 
-                height: 100dvh; 
+        
+        /* 針對螢幕高度極小的橫向模式調整 */
+        @media (max-height: 500px) {
+            .phone-frame {
+                height: 95vh;
+                aspect-ratio: auto; /* 取消比例限制，盡量寬一點 */
+                width: 600px; /* 強制寬度 */
+                max-width: 95vw;
             }
-            .phone-frame { 
-                width: 100%; 
-                height: 100%; 
-                border-radius: 0; 
-                padding: 0; 
-                box-shadow: none; 
-                max-height: none;
-            }
-            .screen { border-radius: 0; }
-            .notch { display: none; } 
             .header { padding-top: 20px; }
-            
-            /* 底部防遮擋修正 */
-            .content-area {
-                padding-bottom: 120px;
-                padding-bottom: calc(100px + env(safe-area-inset-bottom));
-            }
+            .notch { display: none; } /* 空間不夠時隱藏劉海 */
         }
     </style>
 </head>
@@ -228,14 +236,15 @@
 </div>
 
 <script>
-    // ★★★ 請確認指向正確的查經頁面 (V2/V31) ★★★
+    // ★★★ 請確認指向正確的查經頁面 (index.html 或 index_v2.html) ★★★
     const TARGET_PAGE = "index.html"; 
 
-    // 已根據你的要求更新並分類
+    // 更新後的資料
     const hotlineData = [
         { cat: "情緒急救", items: [
             { title: "當你憂傷時", ref: "約翰福音", ch: 14, start: "all" },
             { title: "當你又孤單又懼怕時", ref: "詩篇", ch: 23, start: "all" },
+            // 更正：擔憂 -> 馬太 8:19-34
             { title: "當你擔憂時", ref: "馬太福音", ch: 8, start: 19, end: 34 },
             { title: "當你心情低落時", ref: "詩篇", ch: 27, start: "all" },
             { title: "當你失去盼望時", ref: "詩篇", ch: 126, start: "all" },
@@ -287,7 +296,6 @@
                 const li = document.createElement('li');
                 li.className = 'contact-item';
 
-                // 顯示文字
                 let refDisplay = `${item.ref} ${item.ch}`;
                 if (item.start !== 'all') {
                     refDisplay += `:${item.start}`;
@@ -296,7 +304,6 @@
                     refDisplay += "章";
                 }
 
-                // URL 參數 (注意: "約書亞書" 在顯示時保留，但連結使用 "約書亞記" 以符合資料庫)
                 let bookParam = item.ref;
                 if(bookParam === "約書亞書") bookParam = "約書亞記"; 
 
