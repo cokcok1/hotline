@@ -2,46 +2,44 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>打給上帝的電話</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>緊急熱線</title>
     <style>
         :root {
             --app-bg: #f2f2f7;
             --list-bg: #ffffff;
+            --danger-color: #ff3b30;
             --call-color: #34c759;
             --text-primary: #000000;
             --text-secondary: #8e8e93;
             --border-color: #c6c6c8;
+            --section-header: #6e6e73;
         }
 
         body {
-            background-color: #e0e0e0; /* 網頁背景：淺灰色 */
+            background-color: #d1d1d6; /* 桌面背景色 */
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh; /* 佔滿整個視窗高度 */
+            min-height: 100vh;
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden; /* 防止背景滾動 */
+            /* 防止 iOS 彈性滾動導致背景穿幫 */
+            overscroll-behavior-y: none;
         }
 
-        /* 手機外框 - 調整為永遠顯示 */
+        /* 手機外框 (模擬器) */
         .phone-frame {
+            width: 390px; /* iPhone 13/14 Pro 寬度 */
+            height: 844px;
             background-color: #000;
-            border-radius: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border-radius: 50px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
             padding: 12px;
             box-sizing: border-box;
             position: relative;
-            
-            /* 關鍵修改：在任何裝置上都保持比例，佔據約 90% */
-            width: 375px; 
-            height: 812px;
-            max-width: 95vw; /* 寬度不超過螢幕的 95% */
-            max-height: 92vh; /* 高度不超過螢幕的 92% */
-            
-            display: flex;
-            flex-direction: column;
+            /* 確保在小屏幕桌面也能顯示 */
+            max-height: 95vh;
         }
 
         /* 屏幕區域 */
@@ -49,64 +47,78 @@
             width: 100%;
             height: 100%;
             background-color: var(--app-bg);
-            border-radius: 32px;
+            border-radius: 40px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             position: relative;
         }
 
-        /* 頂部劉海 */
+        /* 頂部劉海 (裝飾) */
         .notch {
             position: absolute;
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 40%;
-            height: 25px;
+            width: 120px;
+            height: 35px;
             background-color: #000;
-            border-bottom-left-radius: 15px;
-            border-bottom-right-radius: 15px;
-            z-index: 10;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            z-index: 100;
         }
 
         /* App 標題欄 */
         .header {
-            padding: 45px 20px 15px 20px;
-            background-color: var(--list-bg);
-            border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0; /* 防止標題被壓縮 */
+            padding: 60px 20px 15px 20px;
+            background-color: var(--app-bg);
+            /* 模擬毛玻璃效果標題 */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 10;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 28px;
-            font-weight: 800;
+            font-size: 34px;
+            font-weight: 700;
+            color: var(--text-primary);
             letter-spacing: -0.5px;
         }
         
         .header p {
             margin: 5px 0 0 0;
             color: var(--text-secondary);
-            font-size: 13px;
+            font-size: 15px;
+            font-weight: 400;
         }
 
-        /* 滾動列表區 */
+        /* 內容滾動區 */
         .content-area {
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 20px;
+            padding-bottom: 40px; /* 底部留白 */
         }
 
-        /* 隱藏滾動條 */
-        .content-area::-webkit-scrollbar { display: none; }
+        /* 隱藏滾動條美觀化 */
+        .content-area::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        .section-title {
+            padding: 20px 20px 8px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--section-header);
+            text-transform: uppercase;
+        }
 
         .contact-list {
             background-color: var(--list-bg);
             list-style: none;
             padding: 0;
             margin: 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .contact-item {
@@ -114,72 +126,98 @@
             align-items: center;
             justify-content: space-between;
             padding: 12px 20px;
-            border-bottom: 1px solid #efefef;
+            margin-left: 20px; /* iOS 風格分隔線縮排 */
+            padding-left: 0;
+            border-bottom: 1px solid #e5e5ea;
             cursor: pointer;
             transition: background 0.2s;
         }
 
         .contact-item:last-child { border-bottom: none; }
-        .contact-item:active { background-color: #f2f2f7; }
+        .contact-item:active { background-color: #e5e5ea; }
 
-        .info { flex: 1; padding-right: 10px; }
+        .info { flex: 1; padding-right: 15px; }
         
         .situation { 
-            font-size: 16px; 
-            font-weight: 600; 
-            margin-bottom: 3px; 
+            font-size: 17px; 
+            font-weight: 400; 
             color: var(--text-primary);
+            margin-bottom: 4px;
         }
         
-        .action-text {
-            font-size: 13px;
-            color: #555;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .bible-ref-badge {
-            font-size: 12px;
-            color: var(--text-secondary);
-            background: #f0f0f0;
-            padding: 2px 6px;
-            border-radius: 4px;
+        /* 修改：直接顯示經文，顏色改為藍色或灰色，視乎喜好，這裡用灰色模仿 iOS 副標題 */
+        .bible-ref { 
+            font-size: 15px; 
+            color: var(--text-secondary); 
+            font-weight: 400;
         }
 
         /* 撥號按鈕 */
         .call-btn {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            background-color: var(--call-color);
+            background-color: transparent;
+            border: 1px solid #d1d1d6;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: white;
+            color: var(--call-color);
             text-decoration: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: transform 0.1s;
-            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        
+        /* 模仿點擊效果：變實心綠 */
+        .contact-item:active .call-btn, .call-btn:active {
+            background-color: var(--call-color);
+            border-color: var(--call-color);
+            color: white;
         }
 
-        .call-btn:active { transform: scale(0.9); }
-        .call-btn svg { width: 18px; height: 18px; fill: white; }
+        .call-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
-        /* 底部裝飾條 */
+        /* 底部 Home Indicator */
         .home-indicator {
             position: absolute;
-            bottom: 6px;
+            bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
-            width: 35%;
-            height: 4px;
+            width: 130px;
+            height: 5px;
             background-color: #000;
             border-radius: 10px;
             opacity: 0.2;
             pointer-events: none;
         }
 
+        /* --- 手機版適配 (Android/iOS 真機瀏覽) --- */
+        @media (max-width: 600px) {
+            body { 
+                background-color: var(--app-bg); 
+                display: block; 
+                height: 100vh; /* Fallback */
+                height: 100dvh; /* Dynamic Height 解決 Android 網址列問題 */
+            }
+            .phone-frame { 
+                width: 100%; 
+                height: 100%; 
+                border-radius: 0; 
+                padding: 0; 
+                box-shadow: none; 
+                max-height: none;
+            }
+            .screen { 
+                border-radius: 0; 
+            }
+            .notch { display: none; } 
+            .header { padding-top: 20px; } /* 狀態列空間 */
+            
+            /* 關鍵修正：底部增加 padding，防止被 Android 導航列遮擋 */
+            .content-area {
+                padding-bottom: 120px; /* 增加底部空間 */
+                padding-bottom: calc(100px + env(safe-area-inset-bottom));
+            }
+        }
     </style>
 </head>
 <body>
@@ -189,92 +227,116 @@
         <div class="notch"></div>
         
         <div class="header">
-            <h1>打給上帝的電話</h1>
-            <p>隨時撥打，不佔線，全天候接聽</p>
+            <h1>緊急熱線</h1>
+            <p>神的話語，是你隨時的幫助</p>
         </div>
 
         <div class="content-area" id="listContainer">
-            <ul class="contact-list" id="mainList">
-                </ul>
-        </div>
+            </div>
 
         <div class="home-indicator"></div>
     </div>
 </div>
 
 <script>
-    // ★★★ 設定目標網址 (請確認你的 index_v2.html 路徑) ★★★
+    // ★★★ 請確認這裡是指向你的 V2 頁面 ★★★
     const TARGET_PAGE = "index.html"; 
 
-    // 新的資料清單
+    // 根據你第一篇提供的完整資料進行分類
     const hotlineData = [
-        { title: "當你受傷時", action: "禱告", ref: "約翰福音", ch: 14, start: "all" },
-        { title: "當你犯了罪", action: "禱告", ref: "詩篇", ch: 51, start: "all" },
-        { title: "當你面對危險", action: "禱告", ref: "詩篇", ch: 91, start: "all" },
-        { title: "當有人想令你失望", action: "禱告", ref: "詩篇", ch: 27, start: "all" },
-        { title: "當你覺得上帝離你好遠", action: "禱告", ref: "詩篇", ch: 139, start: "all" },
-        { title: "當你的信心需要鼓勵時", action: "禱告", ref: "希伯來書", ch: 11, start: "all" },
-        { title: "當你又孤單又懼怕時", action: "禱告", ref: "詩篇", ch: 23, start: "all" },
-        { title: "當你煩憂時", action: "禱告", ref: "馬太福音", ch: 8, start: 19, end: 34 },
-        { title: "當你受傷害，心懷不平時", action: "禱告", ref: "哥林多後書", ch: 5, start: 15, end: 18 },
-        { title: "當你覺得被遺棄被隔絕時", action: "禱告", ref: "羅馬書", ch: 8, start: 31, end: 39 },
-        { title: "當你尋找平安時", action: "禱告", ref: "馬太福音", ch: 11, start: 25, end: 30 },
-        { title: "當你覺得世界比上帝更大時", action: "禱告", ref: "詩篇", ch: 90, start: "all" },
-        { title: "當你需要基督好像需要保障時", action: "禱告", ref: "羅馬書", ch: 8, start: 1, end: 30 },
-        { title: "當你出門遠行時", action: "禱告", ref: "詩篇", ch: 121, start: "all" },
-        { title: "當你為自己禱告時", action: "禱告", ref: "詩篇", ch: 87, start: "all" },
-        { title: "當你需要勇氣去完成一項工作時", action: "禱告", ref: "約書亞記", ch: 1, start: "all" },
-        { title: "當你為投資與開支煩惱夜不能眠時", action: "禱告", ref: "馬可福音", ch: 10, start: 17, end: 31 },
-        { title: "當你的心情感低落時", action: "禱告", ref: "詩篇", ch: 27, start: "all" },
-        { title: "當你的銀行戶口結餘是零時", action: "禱告", ref: "詩篇", ch: 37, start: "all" },
-        { title: "當對所有人失去信心時", action: "禱告", ref: "哥林多前書", ch: 13, start: "all" },
-        { title: "當你覺得周圍的人不友善時", action: "禱告", ref: "約翰福音", ch: 15, start: "all" },
-        { title: "當你失去盼望時", action: "禱告", ref: "詩篇", ch: 126, start: "all" },
-        { title: "當你覺得世界比你小時", action: "禱告", ref: "詩篇", ch: 19, start: "all" },
-        { title: "當你希望經歷出果子時", action: "禱告", ref: "加拉太書", ch: 5, start: 22, end: 23 },
-        { title: "當你覺得很好的機遇或河溪失敗時", action: "禱告", ref: "以賽亞書", ch: 55, start: "all" },
-        { title: "當你想與他人和睦相處時", action: "禱告", ref: "羅馬書", ch: 12, start: "all" }
+        { cat: "情緒急救", items: [
+            { title: "當你憂傷時", ref: "約翰福音", ch: 14, start: "all" },
+            { title: "當你又孤單又懼怕時", ref: "詩篇", ch: 23, start: "all" },
+            { title: "當你擔憂時", ref: "馬太福音", ch: 8, start: 19, end: 34 },
+            { title: "當你心情低落時", ref: "詩篇", ch: 27, start: "all" },
+            { title: "當你失去盼望時", ref: "詩篇", ch: 126, start: "all" },
+            { title: "當你受傷害心懷不平時", ref: "哥林多前書", ch: 13, start: "all" },
+            { title: "當你覺得被遺棄時", ref: "羅馬書", ch: 8, start: 31, end: 39 }
+        ]},
+        { cat: "靈性危機", items: [
+            { title: "當你犯了罪", ref: "詩篇", ch: 51, start: "all" },
+            { title: "當你懷疑基督信仰時", ref: "哥林多後書", ch: 5, start: 15, end: 18 },
+            { title: "當你覺得世界比上帝大", ref: "詩篇", ch: 90, start: "all" },
+            { title: "當你覺得世界比你小", ref: "詩篇", ch: 19, start: "all" }
+        ]},
+        { cat: "尋求指引與保護", items: [
+            { title: "當你面對危難", ref: "詩篇", ch: 91, start: "all" },
+            { title: "當你出門遠行時", ref: "詩篇", ch: 121, start: "all" },
+            { title: "需要勇氣完成工作", ref: "約書亞記", ch: 1, start: "all" },
+            { title: "當你尋找平安時", ref: "馬太福音", ch: 11, start: 25, end: 30 },
+            { title: "當你需要喜樂的秘訣", ref: "歌羅西書", ch: 3, start: 12, end: 17 },
+            { title: "當你碰到很好的機遇", ref: "以賽亞書", ch: 55, start: "all" }
+        ]},
+        { cat: "人際與生活", items: [
+            { title: "對所有人失去信心時", ref: "哥林多前書", ch: 13, start: "all" },
+            { title: "覺得周圍的人不友善", ref: "約翰福音", ch: 15, start: "all" },
+            { title: "想與其他人和睦相處", ref: "羅馬書", ch: 12, start: "all" },
+            { title: "希望結出果子時", ref: "約翰福音", ch: 15, start: "all" },
+            { title: "為投資與通漲思慮時", ref: "馬可福音", ch: 10, start: 17, end: 31 },
+            { title: "銀行戶口結餘是零時", ref: "詩篇", ch: 37, start: "all" },
+            { title: "需要基督像需要保險", ref: "羅馬書", ch: 8, start: 1, end: 30 },
+            { title: "當你為自己禱告時", ref: "詩篇", ch: 87, start: "all" }
+        ]},
+        { cat: "輔助號碼", items: [
+            { title: "面對驚恐", ref: "詩篇", ch: 3, start: 4, end: 7 },
+            { title: "尋求保護", ref: "詩篇", ch: 121, start: 3, end: 3 },
+            { title: "尋求保障", ref: "馬可福音", ch: 8, start: 35, end: 35 },
+            { title: "尋求雙重保障", ref: "詩篇", ch: 145, start: 18, end: 18 }
+        ]}
     ];
 
     function renderApp() {
-        const container = document.getElementById('mainList');
+        const container = document.getElementById('listContainer');
         
-        hotlineData.forEach(item => {
-            const li = document.createElement('li');
-            li.className = 'contact-item';
+        hotlineData.forEach(category => {
+            // 分類標題
+            const catTitle = document.createElement('div');
+            catTitle.className = 'section-title';
+            catTitle.innerText = category.cat;
+            container.appendChild(catTitle);
 
-            // 構建經文顯示字串
-            let refText = `${item.ref} ${item.ch}`;
-            if(item.start !== 'all') {
-                refText += `:${item.start}`;
-                if(item.end) refText += `-${item.end}`;
-            } else {
-                refText += "章";
-            }
+            // 列表容器
+            const ul = document.createElement('ul');
+            ul.className = 'contact-list';
 
-            // 構建跳轉連結
-            let url = `${TARGET_PAGE}?book=${encodeURIComponent(item.ref)}&chap=${item.ch}&auto=gemini`;
-            if(item.start !== 'all') {
-                url += `&start=${item.start}`;
-                if(item.end) url += `&end=${item.end}`;
-            } else {
-                url += `&start=all`;
-            }
+            category.items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'contact-item';
 
-            // 電話圖示 SVG
-            const phoneIcon = `<svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.98a1 1 0 00-1-.98h-2.9A1 1 0 003.68 4.02C4 13.29 11.71 21 20.98 21.32a1 1 0 001.02-1v-2.94a1 1 0 00-.99-1z"/></svg>`;
+                // 構建顯示文字：例如 "詩篇 51章" 或 "馬太福音 8:19-34"
+                let refDisplay = `${item.ref} ${item.ch}`;
+                if (item.start !== 'all') {
+                    refDisplay += `:${item.start}`;
+                    if (item.end && item.end !== item.start) refDisplay += `-${item.end}`;
+                } else {
+                    refDisplay += "章";
+                }
 
-            li.innerHTML = `
-                <div class="info" onclick="window.open('${url}', '_blank')">
-                    <div class="situation">${item.title}</div>
-                    <div class="action-text">
-                        ${item.action} 
-                        <span class="bible-ref-badge">${refText}</span>
+                // 構建跳轉 URL
+                let url = `${TARGET_PAGE}?book=${encodeURIComponent(item.ref)}&chap=${item.ch}&auto=gemini`;
+                if(item.start !== 'all') {
+                    url += `&start=${item.start}`;
+                    if(item.end) url += `&end=${item.end}`;
+                } else {
+                    url += `&start=all`;
+                }
+
+                // 電話圖示 SVG
+                const phoneIcon = `<svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.057 15.057 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.59 3.98a1 1 0 00-1-.98h-2.9A1 1 0 003.68 4.02C4 13.29 11.71 21 20.98 21.32a1 1 0 001.02-1v-2.94a1 1 0 00-.99-1z"/></svg>`;
+
+                // 點擊整行都能跳轉
+                li.onclick = () => window.open(url, '_blank');
+
+                li.innerHTML = `
+                    <div class="info">
+                        <div class="situation">${item.title}</div>
+                        <div class="bible-ref">${refDisplay}</div>
                     </div>
-                </div>
-                <a href="${url}" class="call-btn" target="_blank">${phoneIcon}</a>
-            `;
-            container.appendChild(li);
+                    <a href="${url}" class="call-btn" target="_blank" onclick="event.stopPropagation()">${phoneIcon}</a>
+                `;
+                ul.appendChild(li);
+            });
+            container.appendChild(ul);
         });
     }
 
